@@ -15,6 +15,8 @@ import java.awt.Toolkit;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -43,13 +45,30 @@ import jdz.NZXN.res.Resources;
  * @author Jaiden Baker
  */
 public class NotificationManager {
-	private static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	private static final int taskBarHeight = Toolkit.getDefaultToolkit().getScreenSize().height - GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
-
 	private static List<Notification> notifications = new ArrayList<Notification>();
-	private static final int gap = 16;
-	private static int y = screenSize.height - taskBarHeight - gap;
-	private static final int x = screenSize.width - Notification.width -gap;
+	
+	private static Dimension screenSize = null;
+	private static int taskBarHeight, y, x;
+	private static final int yGap = 16;
+	private static final Timer detectScreenChange = new Timer();
+	static{
+		detectScreenChange.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (!screenSize.equals(Toolkit.getDefaultToolkit().getScreenSize())){
+					screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+					taskBarHeight = Toolkit.getDefaultToolkit().getScreenSize().height - GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
+					y = screenSize.height - taskBarHeight - yGap;
+					x = screenSize.width - Notification.width -yGap;
+					for(Notification n: notifications){
+						y -= n.getHeight();
+						n.setLocation(x, y);
+						y -= yGap;
+					}
+				}
+			}
+		}, 0, 1000);
+	}
 
 	/**
 	 * Takes a list of notifications and arranges them above any existing notifications, bottom to top
@@ -62,7 +81,7 @@ public class NotificationManager {
 			NotificationManager.notifications.add(n);
 			y -= n.getHeight();
 			n.setLocation(x, y);
-			y -= gap;
+			y -= yGap;
 		}
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -82,7 +101,7 @@ public class NotificationManager {
 	public static void delete(Notification n){
 		int index = notifications.indexOf(n);
 		notifications.remove(index);
-		int dy = n.getHeight()+gap;
+		int dy = n.getHeight()+yGap;
 		for (int i=index; i<notifications.size(); i++){
 			Notification n2 = notifications.get(i);
 			n2.setLocation(x, n2.getY()+dy);

@@ -4,7 +4,7 @@
  * Created by Jaiden Baker on Jul 1, 2017 2:07:22 PM
  * Copyright © 2017. All rights reserved.
  * 
- * Last modified on Jul 11, 2017 4:52:19 PM
+ * Last modified on Jul 24, 2017 1:28:57 PM
  */
 
 package jdz.NZXN.main;
@@ -18,7 +18,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -56,9 +55,9 @@ public class Main {
 		if (!argsList.contains("S"))
 			splashFrame = new SplashFrame();
 		
-		CheckAnnouncementsTask task = new CheckAnnouncementsTask(new Timer());
+		CheckAnnouncementsTask.start();
 		ConfigWindow window = new ConfigWindow(false);
-		task.check();
+		CheckAnnouncementsTask.check();
 		if (argsList.contains("S"))
 			window.sendToTray(new WindowEvent(window, WindowEvent.WINDOW_ICONIFIED, 0, JFrame.ICONIFIED), false);
 		else{

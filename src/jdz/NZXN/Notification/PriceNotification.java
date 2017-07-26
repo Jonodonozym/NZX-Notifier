@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import jdz.NZXN.WebApi.MNZXWebApi;
+import jdz.NZXN.WebApi.NZXWebApi;
 import jdz.NZXN.utils.JHyperlink;
 
 /**
@@ -57,8 +57,8 @@ public class PriceNotification extends Notification{
 				"<font color=#C12828>&#x25BC;</font>";
 		arrow = oldPrice == price ? "" : arrow;
 		
-		JLabel priceLabel = new JHyperlink("<html>"+arrow+"&nbsp;&nbsp;"+price+"¢&nbsp;&nbsp;"+arrow+"</html>" , MNZXWebApi.securityURL+security);
-		JLabel secLabel = new JHyperlink(security,MNZXWebApi.securityURL+security);
+		JLabel priceLabel = new JHyperlink("<html>"+arrow+"&nbsp;&nbsp;"+price+"¢&nbsp;&nbsp;"+arrow+"</html>" , NZXWebApi.securityURL+security);
+		JLabel secLabel = new JHyperlink(security,NZXWebApi.securityURL+security);
 		
 		priceLabel.setFont(priceFont);
 		secLabel.setFont(secFont);

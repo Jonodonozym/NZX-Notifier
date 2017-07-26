@@ -4,7 +4,7 @@
  * Created by Jaiden Baker on Jul 6, 2017 3:21:52 PM
  * Copyright © 2017. All rights reserved.
  * 
- * Last modified on Jul 13, 2017 9:48:24 AM
+ * Last modified on Jul 24, 2017 1:24:08 PM
  */
 
 package jdz.NZXN.Config;
@@ -72,9 +72,9 @@ public class MainConfigPane extends JPanel{
 	}
 	
 	private JLabel[] getTimeLabels(){
-		JLabel lastCheck =   new JLabel("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>" + timeFormat.format(CheckAnnouncementsTask.runningTask.getLastCheck())+"</font>");
-		JLabel currentTime = new JLabel("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.runningTask.getCurrentTime())+"</font>");
-		nextCheck =   new JLabel("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.runningTask.getNextCheck())+"</font>");
+		JLabel lastCheck =   new JLabel("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>" + timeFormat.format(CheckAnnouncementsTask.getLastCheck())+"</font>");
+		JLabel currentTime = new JLabel("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getCurrentTime())+"</font>");
+		nextCheck =   new JLabel("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getNextCheck())+"</font>");
 		
 
 		lastCheck.setAlignmentX(LEFT_ALIGNMENT);
@@ -83,18 +83,18 @@ public class MainConfigPane extends JPanel{
 		
 		nextCheck.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
 		
-		CheckAnnouncementsTask.runningTask.addTaskAfterCheck(new Runnable() {
+		CheckAnnouncementsTask.addTaskAfterCheck(new Runnable() {
 			@Override
 			public void run() {
-				lastCheck.setText("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>" + timeFormat.format(CheckAnnouncementsTask.runningTask.getLastCheck())+"</font>");
-				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.runningTask.getNextCheck())+"</font>");
+				lastCheck.setText("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>" + timeFormat.format(CheckAnnouncementsTask.getLastCheck())+"</font>");
+				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getNextCheck())+"</font>");
 			}
 		});
 		
-		CheckAnnouncementsTask.runningTask.addTaskEachSecond(new Runnable() {
+		CheckAnnouncementsTask.addTaskEachSecond(new Runnable() {
 			@Override
 			public void run() {
-				currentTime.setText("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.runningTask.getCurrentTime())+"</font>");
+				currentTime.setText("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getCurrentTime())+"</font>");
 			}
 		});
 		
@@ -112,7 +112,7 @@ public class MainConfigPane extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (MNZXWebApi.checkConnection()){
-					CheckAnnouncementsTask.runningTask.check();
+					CheckAnnouncementsTask.check();
 					checkResults.setText("Checking now...");
 					new Timer().schedule(new TimerTask() {
 						@Override public void run() {
@@ -147,8 +147,8 @@ public class MainConfigPane extends JPanel{
 			
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				CheckAnnouncementsTask.runningTask.setIntervalMinutes(spinnerModel.getNumber().intValue());
-				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.runningTask.getNextCheck())+"</font>");
+				CheckAnnouncementsTask.setIntervalMinutes(spinnerModel.getNumber().intValue());
+				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getNextCheck())+"</font>");
 			}
 		});
 		

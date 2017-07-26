@@ -4,7 +4,7 @@
  * Created by Jaiden Baker on Jul 4, 2017 4:05:50 PM
  * Copyright © 2017. All rights reserved.
  * 
- * Last modified on Jul 18, 2017 11:31:50 AM
+ * Last modified on Jul 24, 2017 1:24:16 PM
  */
 
 package jdz.NZXN.Config;
@@ -70,7 +70,7 @@ public class ConfigWindow extends SysTrayFrame {
 		setContentPane(tabbedPane);
 
 		// auto-save the config before running a check
-		CheckAnnouncementsTask.runningTask.addTaskBeforeCheck(new Runnable() {
+		CheckAnnouncementsTask.addTaskBeforeCheck(new Runnable() {
 			@Override
 			public void run() {
 				saveConfig();
