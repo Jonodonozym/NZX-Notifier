@@ -10,15 +10,10 @@
 package jdz.NZXN.WebApi;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
@@ -27,7 +22,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import jdz.NZXN.utils.TradeTable;
+import jdz.NZXN.structs.TradeTable;
 
 public class ANZWebApi {
 	public static DateTimeFormatter formatter = new DateTimeFormatterBuilder()
@@ -35,21 +30,9 @@ public class ANZWebApi {
 			.parseDefaulting(ChronoField.YEAR, Year.now().getValue())
 			.toFormatter();
 	
-	private static String loginURL = "https://www.anzsecurities.co.nz/DirectTrade/dynamic/signon.aspx";
-	private static String homeURL = "https://www.anzsecurities.co.nz/DirectTrade/dynamic/marketsummary.aspx";
-	
-	private static String prefURL = "https://www.anzsecurities.co.nz/DirectTrade/secure/preferences.aspx";
-	
-	private static String balanceURL = "https://www.anzsecurities.co.nz/DirectTrade/secure/accounts.aspx?view=bal";
-	private static String balanceClass = "td.dgitlastcolumn.catradingbalance";
-	
-	private static String quoteURL = "https://www.anzsecurities.co.nz/DirectTrade/dynamic/quote.aspx?qqsc=[SEC]&qqe=NZSE";
-	private static String quoteToReplace = "[SEC]";
-	private static String quotePriceClass = "span#quotelast";
-	
 	public static Response login(String username, String password){
 		try {
-	        Connection con = Jsoup.connect(loginURL);
+	        Connection con = Jsoup.connect(Websites.ANZloginURL);
 	        String __VIEWSTATE = con.get().select("input[name=__VIEWSTATE]").first().attr("value");
 	        
 	        Response res = con
@@ -70,51 +53,57 @@ public class ANZWebApi {
 	}
 	
 	public static TradeTable getSecTrades(Response loginResponse, String securityCode){
-		TradeTable trades = new TradeTable();
+		TradeTable tradeTable = new TradeTable();
 		try{
-			if (testLogin(loginResponse)){
-				Document doc = Jsoup.connect(quoteURL.replace(quoteToReplace, securityCode)).cookies(loginResponse.cookies()).get();
-				Element table;
+			if (checkLoggedIn(loginResponse)){
+				Document doc = Jsoup.connect(Websites.ANZquoteURL.replace(Websites.ANZquoteToReplace, securityCode)).cookies(loginResponse.cookies()).get();
 				
-				//bids
-				table = doc.select("table[id=biddepth]").first();
-				for (Element tr: table.select("tbody").select("tr[class=dgitTR]")){
-					Elements td = tr.select("td");
-					double price = Double.parseDouble(td.get(0).text());
-					double volume = Double.parseDouble(td.get(2).text());
-					trades.addBid(price, volume);
-				}
+				addBids(doc, tradeTable);
+				addAsks(doc, tradeTable);
+				addTradeHistory(doc, tradeTable);
 				
-				//asks
-				table = doc.select("table[id=askdepth]").first();
-				for (Element tr: table.select("tbody").select("tr[class=dgitTR]")){
-					Elements td = tr.select("td");
-					double price = Double.parseDouble(td.get(0).text());
-					double volume = Double.parseDouble(td.get(2).text());
-					trades.addAsk(price, volume);
-				}
-				
-				//past trades
-				table = doc.select("table[id=tblRecentTrades]").first();
-				for (Element tr: table.select("tbody").select("tr[class=dgitTR]")){
-					Elements td = tr.select("td");
-					String time = td.get(2).text();
-					double price = Double.parseDouble(td.get(0).text());
-					double volume = Double.parseDouble(td.get(1).text());
-					String cond = td.get(3).text();
-					trades.addTrade(price, volume, time, cond);
-				}
-				
-				return trades;
+				return tradeTable;
 			}
 		}
 		catch (IOException e){ }
-		return trades;
+		return tradeTable;
+	}
+	
+	private static void addBids(Document doc, TradeTable tradeTable){
+		Element bidsTable = doc.select("table[id=biddepth]").first();
+		for (Element tr: bidsTable.select("tbody").select("tr[class=dgitTR]")){
+			Elements td = tr.select("td");
+			double price = Double.parseDouble(td.get(0).text());
+			double volume = Double.parseDouble(td.get(2).text());
+			tradeTable.addBid(price, volume);
+		}
+	}
+	
+	private static void addAsks(Document doc, TradeTable tradeTable){
+		Element asksTable = doc.select("table[id=askdepth]").first();
+		for (Element tr: asksTable.select("tbody").select("tr[class=dgitTR]")){
+			Elements td = tr.select("td");
+			double price = Double.parseDouble(td.get(0).text());
+			double volume = Double.parseDouble(td.get(2).text());
+			tradeTable.addAsk(price, volume);
+		}
+	}
+	
+	private static void addTradeHistory(Document doc, TradeTable tradeTable){
+		Element tradeHistoryTable = doc.select("table[id=tblRecentTrades]").first();
+		for (Element tr: tradeHistoryTable.select("tbody").select("tr[class=dgitTR]")){
+			Elements td = tr.select("td");
+			String time = td.get(2).text();
+			double price = Double.parseDouble(td.get(0).text());
+			double volume = Double.parseDouble(td.get(1).text());
+			String cond = td.get(3).text();
+			tradeTable.addTrade(price, volume, time, cond);
+		}
 	}
 	
 	public static String getDate(){
 		try {
-			Document doc = Jsoup.connect(homeURL).get();
+			Document doc = Jsoup.connect(Websites.ANZhomeURL).get();
 			return doc.select("span[id=NZXMarketSummary_lblMarketDate]").text();
 		}
 		catch (IOException e) { return null; }
@@ -122,27 +111,27 @@ public class ANZWebApi {
 	
 	public static double getSecPrice(Response loginResponse, String securityCode){
 		try {
-			Document doc = Jsoup.connect(quoteURL.replace(quoteToReplace, securityCode)).cookies(loginResponse.cookies()).get();
-			return Double.parseDouble(doc.select(quotePriceClass).text());
+			Document doc = Jsoup.connect(Websites.ANZquoteURL.replace(Websites.ANZquoteToReplace, securityCode)).cookies(loginResponse.cookies()).get();
+			return Double.parseDouble(doc.select(Websites.ANZquotePriceClass).text());
 		}
 		catch (IOException e) { return -1; }
 	}
 	
 	public static String getTradingBalance(Response loginResponse){
 		try {
-			Document doc = Jsoup.connect(balanceURL).cookies(loginResponse.cookies()).get();
-			return doc.select(balanceClass).select("a").text();
+			Document doc = Jsoup.connect(Websites.ANZbalanceURL).cookies(loginResponse.cookies()).get();
+			return doc.select(Websites.ANZbalanceClass).select("a").text();
 		}
 		catch (IOException e) { return null; }
 	}
 	
-	private static boolean testLogin(Response res){
-		return !res.url().toString().startsWith(loginURL);
+	private static boolean checkLoggedIn(Response res){
+		return !res.url().toString().startsWith(Websites.ANZloginURL);
 	}
 	
 	private static String setDefaultView(Response loginResponse, String view){
 		try {
-	        Connection con = Jsoup.connect(prefURL)
+	        Connection con = Jsoup.connect(Websites.ANZprefURL)
 			        .cookies(loginResponse.cookies());
 			Document doc = con.get();
 	        String __VIEWSTATE = doc.select("input[name=__VIEWSTATE]").first().attr("value");

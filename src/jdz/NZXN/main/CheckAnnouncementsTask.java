@@ -9,7 +9,9 @@
 
 package jdz.NZXN.main;
 
-import java.io.IOException;
+import jdz.NZXN.Notification.PriceNotification;
+import jdz.NZXN.WebApi.NZXWebApi;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +19,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import jdz.NZXN.Config.Config;
-import jdz.NZXN.Config.ConfigWindow;
+import jdz.NZXN.GUI.ConfigWindow;
+import jdz.NZXN.IO.AnnouncementIO;
 import jdz.NZXN.Notification.AnnouncementNotification;
 import jdz.NZXN.Notification.Notification;
 import jdz.NZXN.Notification.NotificationManager;
-import jdz.NZXN.Notification.PriceNotification;
-import jdz.NZXN.WebApi.ANZWebApi;
-import jdz.NZXN.WebApi.NZXWebApi;
-import jdz.NZXN.utils.Announcement;
+import jdz.NZXN.structs.Announcement;
 import jdz.NZXN.utils.ComparePrice;
 
 public class CheckAnnouncementsTask{
@@ -81,20 +81,20 @@ public class CheckAnnouncementsTask{
 		Config config = Config.loadConfig();
 		secondsSinceCheck = 0;
 		lastCheck = LocalDateTime.now();
-		if (NZXWebApi.checkConnection())
+		if (NZXWebApi.instance.canConnect())
 		{
-			lastCheck = NZXWebApi.getNZXTime();
+			lastCheck = NZXWebApi.instance.getDateTime();
 			if (lastCheck == null)
 				lastCheck = LocalDateTime.now();
 			
 			List<Notification> notifications = new ArrayList<Notification>();
 			
 			if (config.getAnnEnabled()){
-				List<Announcement> a = NZXWebApi.getAnnouncements(config);
+				List<Announcement> a = NZXWebApi.instance.getMarketAnnouncements(config);
 				if (!a.isEmpty()){
 					if (config.getAnnSaveEnabled())
-							NZXWebApi.downloadAttatchments(a);
-					NZXWebApi.addToCSV(a);
+							NZXWebApi.instance.downloadAttatchments(a);
+					AnnouncementIO.addToCSV(a);
 					notifications.add(new AnnouncementNotification(a));
 				}
 			}
@@ -109,15 +109,15 @@ public class CheckAnnouncementsTask{
 						continue;
 					
 					try {
-						double value = NZXWebApi.getValue(args.get(0));
-						double currentValue = Double.parseDouble(args.get(2));
+						float value = NZXWebApi.instance.getSecurityValue(args.get(0));
+						float currentValue = Float.parseFloat(args.get(2));
 						if (ComparePrice.checkPrice(currentValue, value, args.get(1))){
 							toRemove.add(s);
 							if (args.get(1).equals("Any change"))
 								toAdd.add(args.get(0)+":"+args.get(1)+":"+value);
 							notifications.add(new PriceNotification(args.get(0), value, currentValue));
 						}
-					} catch (IOException | NumberFormatException e) { }
+					} catch (NumberFormatException e) { }
 					
 				}
 				prices.removeAll(toRemove);

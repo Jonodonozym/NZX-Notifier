@@ -4,7 +4,7 @@
  * Created by Jaiden Baker on Jul 13, 2017 11:36:27 AM
  * Copyright © 2017. All rights reserved.
  * 
- * Last modified on Jul 11, 2017 4:52:19 PM
+ * Last modified on Nov 1, 2017 11:56:04 AM
  */
 
 package jdz.NZXN.Notification;
@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import jdz.NZXN.WebApi.NZXWebApi;
+import jdz.NZXN.WebApi.Websites;
 import jdz.NZXN.utils.JHyperlink;
 
 /**
@@ -42,7 +42,7 @@ public class PriceNotification extends Notification{
 		this.oldPrice = oldPrice;
 		setMinimumSize(new Dimension(width,144));
 		
-	    super.displayContents();
+	    displayContents();
 	}
 	
 	@Override
@@ -57,8 +57,8 @@ public class PriceNotification extends Notification{
 				"<font color=#C12828>&#x25BC;</font>";
 		arrow = oldPrice == price ? "" : arrow;
 		
-		JLabel priceLabel = new JHyperlink("<html>"+arrow+"&nbsp;&nbsp;"+price+"¢&nbsp;&nbsp;"+arrow+"</html>" , NZXWebApi.securityURL+security);
-		JLabel secLabel = new JHyperlink(security,NZXWebApi.securityURL+security);
+		JLabel priceLabel = new JHyperlink("<html>"+arrow+"&nbsp;&nbsp;"+price+"¢&nbsp;&nbsp;"+arrow+"</html>" , Websites.NZXsecurityURL+security);
+		JLabel secLabel = new JHyperlink(security,Websites.NZXsecurityURL+security);
 		
 		priceLabel.setFont(priceFont);
 		secLabel.setFont(secFont);

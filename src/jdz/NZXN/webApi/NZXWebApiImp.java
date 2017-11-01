@@ -9,9 +9,7 @@
 
 package jdz.NZXN.WebApi;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -31,23 +29,24 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import jdz.NZXN.Config.Config;
-import jdz.NZXN.utils.Announcement;
+import jdz.NZXN.structs.Announcement;
+import jdz.NZXN.utils.FileLogger;
 
-public class MNZXWebApi {
-	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy, h:mma", Locale.ENGLISH);
-	public static DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("eeee dd MMMM yyyy h:mm:ss a", Locale.ENGLISH);
+public class NZXWebApiImp implements NZXWebApi{
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy, h:mm a", Locale.ENGLISH);
 	
-	public static String site = "https://m.nzx.com";
-	public static String securityURL = "https://m.nzx.com/instruments/";
-	public static String announcementsURL = "https://m.nzx.com/markets/NZSX/announcements";
-	
-	public static String announcementsTable = "table.table-to-list announcements-table";
+	private static final String announcementsTable = "table.table-to-list.announcements-table";
 
-	public static LocalDateTime getNZXTime() {
+	@Override
+	@Deprecated // currently, jsoup cannot run javascript which loads the time
+	public LocalDateTime getDateTime() {
+		return LocalDateTime.now();
+		/*
 		try {
-			Document doc = Jsoup.connect(announcementsURL).get();
+			Document doc = Jsoup.connect(Websites.NZXannouncementsURL).get();
 
 			Elements span = doc.select("div#snapshot-clock");
+			System.out.println(doc.select("span[data-reactroot]"));
 			System.out.println(span.size());
 			String time = span.text();
 			for(Element e: span)
@@ -55,14 +54,15 @@ public class MNZXWebApi {
 			System.out.println(time);
 			return LocalDateTime.parse(time, formatter2);
 		}
-		catch (IOException e) { return null; }
+		catch (IOException e) { return null; }*/
 	}
 
-	public static List<Announcement> getAnnouncements(Config config) {
+	@Override
+	public List<Announcement> getMarketAnnouncements(Config config) {
 
 		Document doc;
 		try {
-			doc = Jsoup.connect(announcementsURL).get();
+			doc = Jsoup.connect(Websites.NZXannouncementsURL).get();
 		} catch (IOException e) {
 			return new ArrayList<Announcement>();
 		}
@@ -124,7 +124,7 @@ public class MNZXWebApi {
 				continue;
 
 			// url
-			String url = site + cells.select("td[data-title=Title]").select("span").select("a").attr("href");
+			String url = Websites.NZXsite + cells.select("td[data-title=Title]").select("span").select("a").attr("href");
 
 			announcements.add(new Announcement(company, companyURL, notification, url, type, dateText, false, false));
 		}
@@ -132,12 +132,20 @@ public class MNZXWebApi {
 		return announcements;
 	}
 
-	public static double getValue(String security) throws IOException, NumberFormatException, NullPointerException {
-		Document doc = Jsoup.connect(securityURL + security).get();
-		return Double.parseDouble(doc.select("span.value").text().replace("$", ""))*100;
+	@Override
+	public float getSecurityValue(String securityCode) {
+		try{
+			Document doc = Jsoup.connect(Websites.NZXsecurityURL + securityCode).get();
+			return Float.parseFloat(doc.select("span.value").text().replace("$", ""))*100;
+		}
+		catch (IOException | NumberFormatException | NullPointerException e){
+			FileLogger.createErrorLog(e);
+		}
+		return -1;
 	}
 
-	public static void downloadAttatchments(List<Announcement> announcements) {
+	@Override
+	public void downloadAttatchments(List<Announcement> announcements) {
 		for (Announcement a : announcements) {
 			Document doc;
 			try {
@@ -152,7 +160,7 @@ public class MNZXWebApi {
 				String fileName = e.select("a").text() + fileURL.substring(fileURL.lastIndexOf("."));
 				try {
 					String dirPath = new File(
-							new MNZXWebApi().getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
+							new NZXWebApiImp().getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
 							+ File.separator + "Past Announcements" + File.separator + a.notification + ", " + a.time;
 					new File(dirPath).mkdir();
 					URL url = new URL("https://www.nzx.com" + fileURL);
@@ -166,48 +174,8 @@ public class MNZXWebApi {
 		}
 	}
 
-	public static void addToCSV(List<Announcement> announcements) {
-		try {
-			File csv = getCSVFile();
-			if (csv == null)
-				return;
-			BufferedWriter bw = new BufferedWriter(new FileWriter(csv, true));
-			for (Announcement a : announcements) {
-				bw.write(a.company + "," + "\"=HYPERLINK(\"\"" + a.url + "\"\",\"\"" + a.notification.replace(")", "").replace("(", "") + "\"\")\"" + ","
-						+ a.type + "," + a.time);
-				bw.newLine();
-			}
-			bw.flush();
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static File getCSVFile() {
-		try {
-			String dirPath = Paths.get(MNZXWebApi.class.getProtectionDomain().getCodeSource().getLocation().toURI())
-					.toFile() + File.separator + "Past Announcements";
-			String pastAnnPath = dirPath + File.separator + "Past Announcements.csv";
-
-			new File(dirPath).mkdir();
-
-			File pastAnn = new File(pastAnnPath);
-			if (!pastAnn.exists()) {
-				pastAnn.createNewFile();
-				BufferedWriter bw = new BufferedWriter(new FileWriter(pastAnn, true));
-				bw.write("Security,Notification,Type,Date,Time");
-				bw.newLine();
-				bw.close();
-			}
-			return pastAnn;
-		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public static boolean checkConnection(){
+	@Override
+	public boolean canConnect(){
 		try {
 			new URL("https://www.nzx.com/").openConnection().getContent();
 		} catch (IOException e) {

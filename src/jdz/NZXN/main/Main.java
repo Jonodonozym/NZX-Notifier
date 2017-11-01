@@ -25,7 +25,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 
-import jdz.NZXN.Config.ConfigWindow;
+import jdz.NZXN.GUI.ConfigWindow;
 import jdz.NZXN.utils.SplashFrame;
 
 public class Main {

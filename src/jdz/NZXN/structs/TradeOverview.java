@@ -7,7 +7,7 @@
  * Jul 26, 2017 11:31:50 AM
  */
 
-package jdz.NZXN.utils;
+package jdz.NZXN.structs;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

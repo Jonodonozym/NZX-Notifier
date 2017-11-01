@@ -4,7 +4,7 @@
  * Created by Jaiden Baker on Jul 1, 2017 2:25:33 PM
  * Copyright © 2017. All rights reserved.
  * 
- * Last modified on Jul 24, 2017 9:23:31 AM
+ * Last modified on Nov 1, 2017 11:56:11 AM
  */
 
 package jdz.NZXN.Notification;
@@ -22,7 +22,7 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import jdz.NZXN.utils.Announcement;
+import jdz.NZXN.structs.Announcement;
 import jdz.NZXN.utils.JHyperlink;
 
 /**
@@ -44,7 +44,7 @@ public class AnnouncementNotification extends Notification {
     double lines = 5+( announcements.size()>maxAnnouncements?maxAnnouncements+1.5:announcements.size() );
     setMinimumSize(new Dimension(width, (int)(16*lines)));
     
-    super.displayContents();
+    displayContents();
   }
 
   protected JPanel getNotificationPanel(){

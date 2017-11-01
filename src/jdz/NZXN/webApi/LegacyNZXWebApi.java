@@ -34,9 +34,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import jdz.NZXN.Config.Config;
-import jdz.NZXN.utils.Announcement;
+import jdz.NZXN.structs.Announcement;
 
-public class NZXWebApi {
+@Deprecated
+public class LegacyNZXWebApi {
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM yyyy, h:mma", Locale.ENGLISH);
 	public static DateTimeFormatter formatter2 = new DateTimeFormatterBuilder().appendPattern("eee dd MMMM HH:mm:ss")
 			.parseDefaulting(ChronoField.YEAR, Year.now().getValue()).toFormatter(Locale.ENGLISH);
@@ -63,8 +64,7 @@ public class NZXWebApi {
 
 	}
 
-	public static List<Announcement> getAnnouncements(Config config) {
-
+	public static List<Announcement> getAnnouncements(Config config) {		
 		Document doc;
 		try {
 			doc = Jsoup.connect(announcementsURL).get();
@@ -157,7 +157,7 @@ public class NZXWebApi {
 				String fileName = e.select("a").text() + fileURL.substring(fileURL.lastIndexOf("."));
 				try {
 					String dirPath = new File(
-							new NZXWebApi().getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
+							new LegacyNZXWebApi().getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
 							+ File.separator + "Past Announcements" + File.separator + a.notification + ", " + a.time;
 					new File(dirPath).mkdir();
 					URL url = new URL("https://www.nzx.com" + fileURL);
@@ -191,7 +191,7 @@ public class NZXWebApi {
 
 	public static File getCSVFile() {
 		try {
-			String dirPath = Paths.get(NZXWebApi.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+			String dirPath = Paths.get(LegacyNZXWebApi.class.getProtectionDomain().getCodeSource().getLocation().toURI())
 					.toFile() + File.separator + "Past Announcements";
 			String pastAnnPath = dirPath + File.separator + "Past Announcements.csv";
 

@@ -46,7 +46,6 @@ public abstract class Notification extends JDialog {
 
 	Notification() {
 		setUndecorated(true);
-		setAlwaysOnTop(true);
 		setVisible(false);
 	}
 	

@@ -7,7 +7,7 @@
  * Last modified on Jul 24, 2017 1:24:16 PM
  */
 
-package jdz.NZXN.Config;
+package jdz.NZXN.GUI;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
+import jdz.NZXN.Config.Config;
 import jdz.NZXN.main.CheckAnnouncementsTask;
 import jdz.NZXN.res.Resources;
 import jdz.NZXN.utils.SysTrayFrame;
@@ -92,6 +93,7 @@ public class ConfigWindow extends SysTrayFrame {
 				Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 				setLocation(dim.width/2-getWidth()/2, dim.height/2-getHeight()/2);
 				setVisible(isVisible);
+				toFront();
 			}
 		});
 	}

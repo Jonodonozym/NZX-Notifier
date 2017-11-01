@@ -4,12 +4,13 @@
  * Created by Jaiden Baker on Jul 6, 2017 3:21:52 PM
  * Copyright © 2017. All rights reserved.
  * 
- * Last modified on Jul 24, 2017 1:24:08 PM
+ * Last modified on Nov 1, 2017 12:26:01 PM
  */
 
-package jdz.NZXN.Config;
+package jdz.NZXN.GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -22,6 +23,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,7 +34,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import jdz.NZXN.WebApi.MNZXWebApi;
+import jdz.NZXN.Config.Config;
+import jdz.NZXN.WebApi.NZXWebApi;
 import jdz.NZXN.main.CheckAnnouncementsTask;
 
 @SuppressWarnings("serial")
@@ -40,6 +43,7 @@ public class MainConfigPane extends JPanel{
 	private int border = 16;
 	private SpinnerNumberModel spinnerModel;
 	private JLabel nextCheck;
+	private JCheckBox isMutedCheckbox;
 	private DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("dd MMMM, hh:mm:ss");
 
 	MainConfigPane(ConfigWindow configWindow, Config config){
@@ -104,14 +108,14 @@ public class MainConfigPane extends JPanel{
 	private JPanel getCheckNowPanel(){
 		JPanel checkNowPanel = new JPanel();
 		JLabel checkResults = new JLabel("");
-		if (!MNZXWebApi.checkConnection())
+		if (!NZXWebApi.instance.canConnect())
 			checkResults.setText("<html><font color=#DE2700>Error: no connection to the NZX website</font>");
 		checkNowPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		JButton checkNow = new JButton("Check Now");
 		checkNow.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (MNZXWebApi.checkConnection()){
+				if (NZXWebApi.instance.canConnect()){
 					CheckAnnouncementsTask.check();
 					checkResults.setText("Checking now...");
 					new Timer().schedule(new TimerTask() {
@@ -133,13 +137,13 @@ public class MainConfigPane extends JPanel{
 	}
 	
 	private JComponent[] getConfigComponents(ConfigWindow configWindow, Config config){
-		JPanel spinnerPanel = new JPanel();
-		FlowLayout spinnerLayout = new FlowLayout(FlowLayout.LEFT);
-		spinnerLayout.setHgap(0);
-		spinnerPanel.setLayout(spinnerLayout);
-		JLabel spinnerLabel = new JLabel("Check Interval (Minutes)");
-		spinnerLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
-		spinnerPanel.add(spinnerLabel);
+		JPanel checkIntervalPanel = new JPanel();
+		FlowLayout checkIntervalLayout = new FlowLayout(FlowLayout.LEFT);
+		checkIntervalLayout.setHgap(0);
+		checkIntervalPanel.setLayout(checkIntervalLayout);
+		JLabel checkIntervalLabel = new JLabel("Check Interval (Minutes)");
+		checkIntervalLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
+		checkIntervalPanel.add(checkIntervalLabel);
 		spinnerModel = new SpinnerNumberModel(config.getInterval(), 1, Integer.MAX_VALUE, 1);
 		JSpinner spinner = new JSpinner(spinnerModel);
 		spinner.getEditor().setPreferredSize(new Dimension(48,12));
@@ -152,18 +156,23 @@ public class MainConfigPane extends JPanel{
 			}
 		});
 		
-		spinnerPanel.add(spinner);
-		spinnerPanel.setAlignmentX(LEFT_ALIGNMENT);
+		checkIntervalPanel.add(spinner);
+		checkIntervalPanel.setAlignmentX(LEFT_ALIGNMENT);
 		
+		isMutedCheckbox = new JCheckBox("Silent mode");
+		isMutedCheckbox.setToolTipText("<html><p width=\"256\">If selected, notifications will no longer stay on top of other windows or play sounds. </p></html>");
+		isMutedCheckbox.setBackground(Color.white);
 		
-		return new JComponent[]{spinnerPanel};
+		return new JComponent[]{checkIntervalPanel, isMutedCheckbox};
 	}
 	
 	void reloadConfig(Config config){
 		spinnerModel.setValue(config.getInterval());
+		isMutedCheckbox.setSelected(config.getMuted());
 	}
 	
 	void saveConfig(Config config){
 		config.setInterval(spinnerModel.getNumber().intValue());
+		config.setMuted(isMutedCheckbox.isSelected());
 	}
 }

@@ -4,10 +4,10 @@
  * Created by Jaiden Baker on Jul 6, 2017 3:21:42 PM
  * Copyright © 2017. All rights reserved.
  * 
- * Last modified on Jul 11, 2017 4:33:24 PM
+ * Last modified on Nov 1, 2017 12:26:09 PM
  */
 
-package jdz.NZXN.Config;
+package jdz.NZXN.GUI;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,7 +33,8 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
-import jdz.NZXN.WebApi.MNZXWebApi;
+import jdz.NZXN.Config.Config;
+import jdz.NZXN.IO.AnnouncementIO;
 import jdz.NZXN.res.Resources;
 
 @SuppressWarnings("serial")
@@ -124,7 +125,7 @@ public class AnnounceConfigPane extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					File file = MNZXWebApi.getCSVFile();
+					File file = AnnouncementIO.getCSVFile();
 					if(file != null)
 						Runtime.getRuntime().exec("explorer.exe /select," + file.getPath());
 				}

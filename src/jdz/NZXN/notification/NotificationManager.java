@@ -25,7 +25,9 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 import javax.swing.SwingUtilities;
 
+import jdz.NZXN.Config.Config;
 import jdz.NZXN.res.Resources;
+import jdz.NZXN.utils.FileLogger;
 
 /**
  * Static class that manages notifications by sorting them vertically on the bottom-right side
@@ -55,7 +57,7 @@ public class NotificationManager {
 		detectScreenChange.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if (!screenSize.equals(Toolkit.getDefaultToolkit().getScreenSize())){
+				if (screenSize == null || !screenSize.equals(Toolkit.getDefaultToolkit().getScreenSize())){
 					screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 					taskBarHeight = Toolkit.getDefaultToolkit().getScreenSize().height - GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
 					y = screenSize.height - taskBarHeight - yGap;
@@ -77,8 +79,10 @@ public class NotificationManager {
 	public static void add(List<Notification> notifications) {
 		if (notifications.isEmpty())
 			return;
+		Config config = Config.loadConfig();
 		for (Notification n: notifications){
 			NotificationManager.notifications.add(n);
+			n.setAlwaysOnTop(!config.getMuted());
 			y -= n.getHeight();
 			n.setLocation(x, y);
 			y -= yGap;
@@ -90,7 +94,8 @@ public class NotificationManager {
 					n.setVisible(true);
 			}
 		});
-		playSound();
+		if (!config.getMuted())
+			playSound();
 	}
 	
 	/**
@@ -108,16 +113,21 @@ public class NotificationManager {
 		}
 		y += dy;
 	}
+	
+	/**
+	 * Sets all of the notifications to always be on top or not
+	 * @param alwaysOnTop
+	 */
+	public static void setAlwaysOnTop(boolean alwaysOnTop){
+		for(Notification n: notifications)
+			n.setAlwaysOnTop(alwaysOnTop);
+	}
 
 	/**
 	 * Summons demons from hell and unleashes them on the world, enacting judgment on sinners and saints alike
 	 * Seriously, it's called playSound. What did you expect it to do?
 	 */
 	private static void playSound() {
-		// despite the try / catch, this will always work unless some idiot messes with the resource incorrectly
-		// please read the Resources class documentation before messing with the resources
-		// or don't
-		// I'm a comment not a police officer
 		try {
 			InputStream is = NotificationManager.class.getResourceAsStream(Resources.notificationSound);
 			AudioInputStream stream = AudioSystem.getAudioInputStream(is);
@@ -128,6 +138,6 @@ public class NotificationManager {
 			clip.open(stream);
 			clip.start();
 		}
-		catch (Exception e) { }
+		catch (Exception e) { FileLogger.createErrorLog(e); }
 	}
 }

@@ -7,7 +7,7 @@
  * Jul 26, 2017 12:06:40 PM
  */
 
-package jdz.NZXN.utils;
+package jdz.NZXN.structs;
 
 import java.awt.GridLayout;
 import java.util.ArrayList;
