@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import jdz.NZXN.Notification.Notification;
 import jdz.NZXN.main.Main;
+import jdz.NZXN.notification.Notification;
 
 public class Resources {
 	public static BufferedImage appIcon, bannerImage, infoIcon, PSFlag;

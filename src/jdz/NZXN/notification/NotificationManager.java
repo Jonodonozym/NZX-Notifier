@@ -7,7 +7,7 @@
  * Last modified on Jul 17, 2017 1:46:41 PM
  */
 
-package jdz.NZXN.Notification;
+package jdz.NZXN.notification;
 
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -25,7 +25,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 import javax.swing.SwingUtilities;
 
-import jdz.NZXN.Config.Config;
+import jdz.NZXN.config.Config;
 import jdz.NZXN.res.Resources;
 import jdz.NZXN.utils.FileLogger;
 

@@ -1,5 +1,5 @@
 
-package jdz.NZXN.IO;
+package jdz.NZXN.io;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,8 +9,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
 
-import jdz.NZXN.WebApi.NZXWebApiImp;
 import jdz.NZXN.structs.Announcement;
+import jdz.NZXN.webApi.NZXWebApiImp;
 
 public class AnnouncementIO {
 	public static void addToCSV(List<Announcement> announcements) {

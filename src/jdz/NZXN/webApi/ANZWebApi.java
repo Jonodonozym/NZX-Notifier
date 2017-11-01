@@ -7,7 +7,7 @@
  * Last modified on Jul 21, 2017 2:35:38 PM
  */
 
-package jdz.NZXN.WebApi;
+package jdz.NZXN.webApi;
 
 import java.io.IOException;
 import java.time.Year;

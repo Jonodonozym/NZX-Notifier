@@ -7,7 +7,7 @@
  * Last modified on Jul 24, 2017 6:18:49 AM
  */
 
-package jdz.NZXN.WebApi;
+package jdz.NZXN.webApi;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import jdz.NZXN.Config.Config;
+import jdz.NZXN.config.Config;
 import jdz.NZXN.structs.Announcement;
 import jdz.NZXN.utils.FileLogger;
 

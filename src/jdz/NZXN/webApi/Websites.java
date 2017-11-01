@@ -1,5 +1,5 @@
 
-package jdz.NZXN.WebApi;
+package jdz.NZXN.webApi;
 
 public class Websites {
 	public static final String ANZloginURL = "https://www.anzsecurities.co.nz/DirectTrade/dynamic/signon.aspx";

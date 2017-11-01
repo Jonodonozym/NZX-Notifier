@@ -7,7 +7,7 @@
  * Last modified on Nov 1, 2017 12:26:01 PM
  */
 
-package jdz.NZXN.GUI;
+package jdz.NZXN.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,9 +34,9 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import jdz.NZXN.Config.Config;
-import jdz.NZXN.WebApi.NZXWebApi;
+import jdz.NZXN.config.Config;
 import jdz.NZXN.main.CheckAnnouncementsTask;
+import jdz.NZXN.webApi.NZXWebApi;
 
 @SuppressWarnings("serial")
 public class MainConfigPane extends JPanel{

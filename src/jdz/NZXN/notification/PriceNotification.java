@@ -7,7 +7,7 @@
  * Last modified on Nov 1, 2017 11:56:04 AM
  */
 
-package jdz.NZXN.Notification;
+package jdz.NZXN.notification;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -18,8 +18,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import jdz.NZXN.WebApi.Websites;
 import jdz.NZXN.utils.JHyperlink;
+import jdz.NZXN.webApi.Websites;
 
 /**
  * Notification class that displays a price on the screen

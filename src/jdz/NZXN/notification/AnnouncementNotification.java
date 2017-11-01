@@ -7,7 +7,7 @@
  * Last modified on Nov 1, 2017 11:56:11 AM
  */
 
-package jdz.NZXN.Notification;
+package jdz.NZXN.notification;
 
 import java.awt.BorderLayout;
 import java.awt.Container;

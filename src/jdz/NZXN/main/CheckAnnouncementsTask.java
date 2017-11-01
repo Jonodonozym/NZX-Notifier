@@ -9,8 +9,13 @@
 
 package jdz.NZXN.main;
 
-import jdz.NZXN.Notification.PriceNotification;
-import jdz.NZXN.WebApi.NZXWebApi;
+import jdz.NZXN.config.Config;
+import jdz.NZXN.gui.ConfigWindow;
+import jdz.NZXN.io.AnnouncementIO;
+import jdz.NZXN.notification.AnnouncementNotification;
+import jdz.NZXN.notification.Notification;
+import jdz.NZXN.notification.NotificationManager;
+import jdz.NZXN.notification.PriceNotification;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,14 +23,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import jdz.NZXN.Config.Config;
-import jdz.NZXN.GUI.ConfigWindow;
-import jdz.NZXN.IO.AnnouncementIO;
-import jdz.NZXN.Notification.AnnouncementNotification;
-import jdz.NZXN.Notification.Notification;
-import jdz.NZXN.Notification.NotificationManager;
 import jdz.NZXN.structs.Announcement;
 import jdz.NZXN.utils.ComparePrice;
+import jdz.NZXN.webApi.NZXWebApi;
 
 public class CheckAnnouncementsTask{
 	private static ActualTask runningTask = null;

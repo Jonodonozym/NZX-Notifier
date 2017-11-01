@@ -7,7 +7,7 @@
  * Last modified on Jul 6, 2017 5:05:08 PM
  */
 
-package jdz.NZXN.GUI;
+package jdz.NZXN.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,7 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import jdz.NZXN.Config.Config;
+import jdz.NZXN.config.Config;
 
 public class PriceConfigPane extends JPanel{
 	private static final long serialVersionUID = -5428649224901878255L;

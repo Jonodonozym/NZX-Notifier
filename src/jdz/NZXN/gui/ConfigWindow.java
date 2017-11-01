@@ -7,7 +7,7 @@
  * Last modified on Jul 24, 2017 1:24:16 PM
  */
 
-package jdz.NZXN.GUI;
+package jdz.NZXN.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import jdz.NZXN.Config.Config;
+import jdz.NZXN.config.Config;
 import jdz.NZXN.main.CheckAnnouncementsTask;
 import jdz.NZXN.res.Resources;
 import jdz.NZXN.utils.SysTrayFrame;

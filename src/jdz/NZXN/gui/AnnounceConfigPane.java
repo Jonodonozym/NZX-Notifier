@@ -7,7 +7,7 @@
  * Last modified on Nov 1, 2017 12:26:09 PM
  */
 
-package jdz.NZXN.GUI;
+package jdz.NZXN.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,8 +33,8 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
-import jdz.NZXN.Config.Config;
-import jdz.NZXN.IO.AnnouncementIO;
+import jdz.NZXN.config.Config;
+import jdz.NZXN.io.AnnouncementIO;
 import jdz.NZXN.res.Resources;
 
 @SuppressWarnings("serial")

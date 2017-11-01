@@ -7,7 +7,7 @@
  * Last modified on Jul 18, 2017 11:21:22 AM
  */
 
-package jdz.NZXN.Config;
+package jdz.NZXN.config;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +24,7 @@ import java.util.Properties;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import jdz.NZXN.Notification.NotificationManager;
+import jdz.NZXN.notification.NotificationManager;
 import jdz.NZXN.utils.ExportFile;
 
 /**

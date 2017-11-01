@@ -7,7 +7,7 @@
  * Last modified on Jul 12, 2017 1:46:37 PM
  */
 
-package jdz.NZXN.GUI;
+package jdz.NZXN.gui;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

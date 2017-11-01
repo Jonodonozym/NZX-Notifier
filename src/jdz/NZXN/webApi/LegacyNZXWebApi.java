@@ -7,7 +7,7 @@
  * Last modified on Jul 24, 2017 9:18:01 AM
  */
 
-package jdz.NZXN.WebApi;
+package jdz.NZXN.webApi;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,7 +33,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import jdz.NZXN.Config.Config;
+import jdz.NZXN.config.Config;
 import jdz.NZXN.structs.Announcement;
 
 @Deprecated

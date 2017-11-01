@@ -7,7 +7,7 @@
  * Last modified on Jul 17, 2017 1:34:23 PM
  */
 
-package jdz.NZXN.Notification;
+package jdz.NZXN.notification;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
