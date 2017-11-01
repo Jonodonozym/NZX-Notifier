@@ -37,7 +37,6 @@ import jdz.NZXN.utils.ExportFile;
  */
 public class Config {
 	private Properties props;
-	private boolean isMuted = false;
 	
 	// setters
 	public void setLastCheck(LocalDateTime time){ props.setProperty("LastCheck", time.toString()); }
@@ -52,7 +51,7 @@ public class Config {
 	public void setDescBlacklist(List<String> securities){ props.setProperty("DescBlacklist", mergeList(securities).toLowerCase()); }
 	public void setPriceEnabled(boolean isEnabled){ props.setProperty("PricesEnabled", ""+isEnabled); }
 	public void setPriceAlerts(List<String> priceAlerts){ props.setProperty("PriceAlerts", mergeList(priceAlerts)); }
-	public void setMuted(boolean isMuted){ this.isMuted = isMuted; NotificationManager.setAlwaysOnTop(!isMuted);}
+	public void setMuted(boolean isMuted){ props.setProperty("isMuted", isMuted+""); NotificationManager.setAlwaysOnTop(!isMuted);}
 	
 	// getters
 	public LocalDateTime getLastCheck(){
@@ -72,7 +71,7 @@ public class Config {
 	public List<String> getDescBlacklist(){ return parseList(props.getProperty("DescBlacklist")); }
 	public boolean getPriceEnabled(){ return Boolean.parseBoolean(props.getProperty("PricesEnabled")); }
 	public List<String> getPriceAlerts(){ return parseList(props.getProperty("PriceAlerts")); }
-	public boolean getMuted(){ return isMuted; }
+	public boolean getMuted(){ return Boolean.parseBoolean(props.getProperty("isMuted")); }
 	
 	// helper method to merge a list into a single string
 	public String mergeList(List<String> list){ return mergeList(list, ","); }
