@@ -18,7 +18,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.JFrame;
@@ -36,22 +38,46 @@ import jdz.NZXN.utils.ExportFile;
  * @author Jaiden Baker
  */
 public class Config {
-	private Properties props;
+	private static final Config instance = Config.loadConfig();
 	
+	private Properties props;
+	private Map<String, List<ConfigChangeListener>> listeners = new HashMap<String, List<ConfigChangeListener>>();
+	
+	public static Config getInstance(){
+		return instance;
+	}
+
+	public void addListener(String property, ConfigChangeListener l){
+		if (!listeners.containsKey(property))
+			listeners.put(property, new ArrayList<ConfigChangeListener>());
+		listeners.get(property).add(l);
+	}
+
 	// setters
-	public void setLastCheck(LocalDateTime time){ props.setProperty("LastCheck", time.toString()); }
-	public void setInterval(int interval){ props.setProperty("CheckIntervalMinutes", ""+interval); }
-	public void setAnnEnabled(boolean isEnabled){ props.setProperty("AnnouncementEnabled", ""+isEnabled); }
-	public void setAnnSaveEnabled(boolean isEnabled){ props.setProperty("AnnouncementSaving", ""+isEnabled); }
-	public void setSecWhitelist(List<String> securities){ props.setProperty("SecWhitelist", mergeList(securities).toUpperCase()); }
-	public void setTypeWhitelist(List<String> securities){ props.setProperty("TypeWhitelist", mergeList(securities).toUpperCase()); }
-	public void setDescWhitelist(List<String> securities){ props.setProperty("DescWhitelist", mergeList(securities).toLowerCase()); }
-	public void setSecBlacklist(List<String> securities){ props.setProperty("SecBlacklist", mergeList(securities).toUpperCase()); }
-	public void setTypeBlacklist(List<String> securities){ props.setProperty("TypeBlacklist", mergeList(securities).toUpperCase()); }
-	public void setDescBlacklist(List<String> securities){ props.setProperty("DescBlacklist", mergeList(securities).toLowerCase()); }
-	public void setPriceEnabled(boolean isEnabled){ props.setProperty("PricesEnabled", ""+isEnabled); }
-	public void setPriceAlerts(List<String> priceAlerts){ props.setProperty("PriceAlerts", mergeList(priceAlerts)); }
-	public void setMuted(boolean isMuted){ props.setProperty("isMuted", isMuted+""); NotificationManager.setAlwaysOnTop(!isMuted);}
+	public void setProperty(String property, Object value){
+		String newValue = value.toString();
+		
+		ConfigChangeEvent e = new ConfigChangeEvent(property, props.getProperty(property), newValue);
+		props.setProperty(property, newValue);
+		
+		if (listeners.containsKey(property))
+			for (ConfigChangeListener l: listeners.get(property))
+				l.onConfigChange(e);
+	}
+	
+	public void setLastCheck(LocalDateTime time){ setProperty("LastCheck", time); }
+	public void setInterval(int interval){ setProperty("CheckIntervalMinutes", ""+interval); }
+	public void setAnnEnabled(boolean isEnabled){ setProperty("AnnouncementEnabled", ""+isEnabled); }
+	public void setAnnSaveEnabled(boolean isEnabled){ setProperty("AnnouncementSaving", ""+isEnabled); }
+	public void setSecWhitelist(List<String> securities){ setProperty("SecWhitelist", mergeList(securities).toUpperCase()); }
+	public void setTypeWhitelist(List<String> securities){ setProperty("TypeWhitelist", mergeList(securities).toUpperCase()); }
+	public void setDescWhitelist(List<String> securities){ setProperty("DescWhitelist", mergeList(securities).toLowerCase()); }
+	public void setSecBlacklist(List<String> securities){ setProperty("SecBlacklist", mergeList(securities).toUpperCase()); }
+	public void setTypeBlacklist(List<String> securities){ setProperty("TypeBlacklist", mergeList(securities).toUpperCase()); }
+	public void setDescBlacklist(List<String> securities){ setProperty("DescBlacklist", mergeList(securities).toLowerCase()); }
+	public void setPriceEnabled(boolean isEnabled){ setProperty("PricesEnabled", ""+isEnabled); }
+	public void setPriceAlerts(List<String> priceAlerts){ setProperty("PriceAlerts", mergeList(priceAlerts)); }
+	public void setMuted(boolean isMuted){ setProperty("isMuted", isMuted+""); NotificationManager.setAlwaysOnTop(!isMuted);}
 	
 	// getters
 	public LocalDateTime getLastCheck(){
@@ -101,7 +127,7 @@ public class Config {
 	}
 	
 	// static method which creates a new Config instance from the config file in appdata
-	public static Config loadConfig(){
+	private static Config loadConfig(){
 		Config config = new Config();
 		try {
 			config.props = new Properties();

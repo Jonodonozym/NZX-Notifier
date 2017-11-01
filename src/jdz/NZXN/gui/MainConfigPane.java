@@ -15,6 +15,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.time.format.DateTimeFormatter;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,8 +32,6 @@ import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import jdz.NZXN.config.Config;
 import jdz.NZXN.main.CheckAnnouncementsTask;
@@ -147,14 +146,10 @@ public class MainConfigPane extends JPanel{
 		spinnerModel = new SpinnerNumberModel(config.getInterval(), 1, Integer.MAX_VALUE, 1);
 		JSpinner spinner = new JSpinner(spinnerModel);
 		spinner.getEditor().setPreferredSize(new Dimension(48,12));
-		spinner.addChangeListener(new ChangeListener() {
-			
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				CheckAnnouncementsTask.setIntervalMinutes(spinnerModel.getNumber().intValue());
+		spinner.addChangeListener((e) -> {
+				Config.getInstance().setInterval(spinnerModel.getNumber().intValue());
 				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getNextCheck())+"</font>");
-			}
-		});
+			});
 		
 		checkIntervalPanel.add(spinner);
 		checkIntervalPanel.setAlignmentX(LEFT_ALIGNMENT);
@@ -162,6 +157,10 @@ public class MainConfigPane extends JPanel{
 		isMutedCheckbox = new JCheckBox("Silent mode");
 		isMutedCheckbox.setToolTipText("<html><p width=\"256\">If selected, notifications will no longer stay on top of other windows or play sounds. </p></html>");
 		isMutedCheckbox.setBackground(Color.white);
+		isMutedCheckbox.addItemListener((e)->{
+			Config.getInstance().setMuted(e.getStateChange() == ItemEvent.SELECTED);
+		});
+		Config.getInstance().addListener("isMuted", (e)->{isMutedCheckbox.setSelected(Boolean.parseBoolean(e.getNewValue()));});
 		
 		return new JComponent[]{checkIntervalPanel, isMutedCheckbox};
 	}

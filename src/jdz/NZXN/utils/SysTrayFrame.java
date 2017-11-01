@@ -28,6 +28,7 @@ public class SysTrayFrame extends JFrame{
     SystemTray tray;
     Container contentPane;
     String minimizeMessage;
+    PopupMenu popup;
     
     public SysTrayFrame(String title, String minimizeMessage, Container contentPane, Image frameIcon){
         super(title);
@@ -40,26 +41,10 @@ public class SysTrayFrame extends JFrame{
             tray = SystemTray.getSystemTray();
             tray.getTrayIcons();
             
-            ActionListener exitListener = new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                	exit();
-                }
-            };
-            
-            PopupMenu popup = new PopupMenu();
-            
-            MenuItem defaultItem = new MenuItem("Exit");
-            defaultItem.addActionListener(exitListener);
-            popup.add(defaultItem);
-            
-            defaultItem = new MenuItem("Configure");
-            defaultItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    setVisible(true);
-                    setExtendedState(JFrame.NORMAL);
-                }
-            });
-            popup.add(defaultItem);
+            popup = new PopupMenu();
+            MenuItem exitItem = new MenuItem("Exit");
+            exitItem.addActionListener((a)->{exit();});
+	        addSysTrayMenuItem(exitItem);
             
             trayIcon = new TrayIcon(frameIcon, title, popup);
             trayIcon.setImageAutoSize(true);
@@ -91,6 +76,10 @@ public class SysTrayFrame extends JFrame{
 
         setVisible(true);
         setSize(300, 200);
+    }
+    
+    public void addSysTrayMenuItem(MenuItem item){
+        popup.add(item);
     }
 
     public void sendToTray(WindowEvent e){

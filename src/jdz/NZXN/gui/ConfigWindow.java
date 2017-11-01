@@ -9,9 +9,12 @@
 
 package jdz.NZXN.gui;
 
+import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.MenuItem;
 import java.awt.Toolkit;
+import java.awt.event.ItemEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -50,17 +53,29 @@ public class ConfigWindow extends SysTrayFrame {
 		super("NZX Notifier",
 				"The NZX Notifier is still running. " + "Double click this icon to re-open the config window.",
 				new JPanel(), Resources.appIcon);
+
+		Config config = Config.getInstance();
+        
+        MenuItem configureItem = new MenuItem("Configure");
+        configureItem.addActionListener((a)->{
+                setVisible(true);
+                setExtendedState(JFrame.NORMAL);
+            });
+        addSysTrayMenuItem(configureItem);
+        
 		
 		setVisible(false);
 		setBackground(Color.white);
 		setResizable(false);
 		currentWindow = this;
 
-		Config config = Config.loadConfig();
-
 		mainConfig = new MainConfigPane(this, config);
 		priceConfig = new PriceConfigPane(this, config);
 		announceConfig = new AnnounceConfigPane(this, config);
+
+        CheckboxMenuItem muteItem = new CheckboxMenuItem("Mute", config.getMuted());
+        muteItem.addItemListener((l)->{Config.getInstance().setMuted(l.getStateChange() == ItemEvent.SELECTED);});
+        config.addListener("isMuted", (e)->{muteItem.setState(Boolean.parseBoolean(e.getNewValue()));});
 
 		// adding each panel to a tabbed frame
 		JTabbedPane tabbedPane = new JTabbedPane();
@@ -102,7 +117,7 @@ public class ConfigWindow extends SysTrayFrame {
 	 * Takes the config from this window and saves it externally
 	 */
 	public void saveConfig() {
-		Config config = Config.loadConfig();
+		Config config = Config.getInstance();
 		mainConfig.saveConfig(config);
 		announceConfig.saveConfig(config);
 		priceConfig.saveConfig(config);
@@ -113,7 +128,7 @@ public class ConfigWindow extends SysTrayFrame {
 	 * Loads the external config and update the window's contents to match
 	 */
 	public void reloadConfig(){
-		Config config = Config.loadConfig();
+		Config config = Config.getInstance();
 		mainConfig.reloadConfig(config);
 		announceConfig.reloadConfig(config);
 		priceConfig.reloadConfig(config);

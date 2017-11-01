@@ -37,11 +37,17 @@ public class CheckAnnouncementsTask{
 	private static int intervalSeconds = 300;
 	private static LocalDateTime lastCheck = LocalDateTime.now();
 	
+	static{
+		Config.getInstance().addListener("CheckIntervalMinutes", (e)->{
+			setIntervalMinutes(Integer.parseInt(e.getNewValue()));
+			});
+	}
+	
 	public static void start(){
 		if (runningTask != null)
 			throw new RuntimeException("Error: only 1 CheckAnnouncementsTask can exist at a time");
 		runningTask = new ActualTask();
-		Config config = Config.loadConfig();
+		Config config = Config.getInstance();
 		intervalSeconds = config.getInterval()*60;
 		lastCheck = config.getLastCheck();
 		
@@ -78,7 +84,7 @@ public class CheckAnnouncementsTask{
 		for (Runnable r: runBeforeCheck)
 			r.run();
 
-		Config config = Config.loadConfig();
+		Config config = Config.getInstance();
 		secondsSinceCheck = 0;
 		lastCheck = LocalDateTime.now();
 		if (NZXWebApi.instance.canConnect())

@@ -79,7 +79,7 @@ public class NotificationManager {
 	public static void add(List<Notification> notifications) {
 		if (notifications.isEmpty())
 			return;
-		Config config = Config.loadConfig();
+		Config config = Config.getInstance();
 		for (Notification n: notifications){
 			NotificationManager.notifications.add(n);
 			n.setAlwaysOnTop(!config.getMuted());
