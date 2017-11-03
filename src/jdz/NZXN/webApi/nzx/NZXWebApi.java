@@ -1,11 +1,11 @@
 
-package jdz.NZXN.webApi;
+package jdz.NZXN.webApi.nzx;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import jdz.NZXN.config.Config;
-import jdz.NZXN.structs.Announcement;
+import jdz.NZXN.dataStructs.Announcement;
 
 public interface NZXWebApi {
 	public static final NZXWebApi instance = new NZXWebApiImp();

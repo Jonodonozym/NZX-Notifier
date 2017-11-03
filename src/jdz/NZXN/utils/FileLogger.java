@@ -32,6 +32,7 @@ import javax.swing.plaf.ColorUIResource;
  */
 public final class FileLogger {
 	private static BufferedWriter defaultLogWriter = null;
+	private static final String defaultErrorLogMessage = "An error occurred in the application. If you can't work out the issue from this file, send this file to the developer with a description of the failure";
 
 	/**
 	 * Starts a new log file
@@ -119,7 +120,7 @@ public final class FileLogger {
 		File file = new File(fileDir);
 
 		writeFile(
-				"An error occurred in the plugin. If you can't work out the issue from this file, send this file to the plugin developer with a description of the failure",
+				defaultErrorLogMessage,
 				error, file);
 	}
 
@@ -134,11 +135,10 @@ public final class FileLogger {
 		createDefaultDirectory(getLogsDirectory());
 		createDefaultDirectory(getLogsDirectory() + File.separator + "Errors");
 
-		File file = new File(
-				getLogsDirectory() + File.separator + "Errors" + File.separator + "Error " + getTimestamp() + ".txt");
+		File file = new File(getLogsDirectory() + File.separator + "Errors" + File.separator + "Error " + getTimestamp() + ".txt");
 
 		writeFile(
-				"An error occurred in the plugin. If you can't work out the issue from this file, send this file to the plugin developer with a description of the failure",
+				defaultErrorLogMessage,
 				error, file);
 	}
 
@@ -153,19 +153,20 @@ public final class FileLogger {
 			UIManager.put("TabbedPane.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
 			UIManager.put("ComboBox.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
 		} catch (Exception e) {
+			createErrorLog(e);
 		}
 	}
 
 	private static void createErrorFrame() {
 		JOptionPane.showMessageDialog(null,
-				"A Fatal error occurred while running the game and it must exit. Sorry about any unsaved progress...\n"
+				"A fatal error occurred while running the program.\n"
 						+ "Check the latest error log under {installLocation}/Logs/Errors for more details.\n"
 						+ "If you cannot resolve the issue, please send the error log file to the developers.",
 				"Fatal Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	private static String getLogsDirectory() {
-		return File.separator + "Logs";
+		return "Logs";
 	}
 
 	private static void createDefaultDirectory(String directory) {

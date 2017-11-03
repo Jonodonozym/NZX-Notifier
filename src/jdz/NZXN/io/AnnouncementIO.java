@@ -9,8 +9,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
 
-import jdz.NZXN.structs.Announcement;
-import jdz.NZXN.webApi.NZXWebApiImp;
+import jdz.NZXN.dataStructs.Announcement;
+import jdz.NZXN.webApi.nzx.NZXWebApiImp;
 
 public class AnnouncementIO {
 	public static void addToCSV(List<Announcement> announcements) {

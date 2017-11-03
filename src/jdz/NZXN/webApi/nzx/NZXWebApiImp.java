@@ -7,7 +7,7 @@
  * Last modified on Jul 24, 2017 6:18:49 AM
  */
 
-package jdz.NZXN.webApi;
+package jdz.NZXN.webApi.nzx;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,8 +29,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import jdz.NZXN.config.Config;
-import jdz.NZXN.structs.Announcement;
+import jdz.NZXN.dataStructs.Announcement;
 import jdz.NZXN.utils.FileLogger;
+import jdz.NZXN.webApi.Websites;
 
 public class NZXWebApiImp implements NZXWebApi{
 	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy, h:mm a", Locale.ENGLISH);

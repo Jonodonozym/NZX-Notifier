@@ -7,7 +7,7 @@
  * Last modified on Jul 24, 2017 9:18:01 AM
  */
 
-package jdz.NZXN.webApi;
+package jdz.NZXN.webApi.nzx;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,7 +34,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import jdz.NZXN.config.Config;
-import jdz.NZXN.structs.Announcement;
+import jdz.NZXN.dataStructs.Announcement;
 
 @Deprecated
 public class LegacyNZXWebApi {
