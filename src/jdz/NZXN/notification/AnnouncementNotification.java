@@ -22,7 +22,7 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import jdz.NZXN.structs.Announcement;
+import jdz.NZXN.dataStructs.Announcement;
 import jdz.NZXN.utils.JHyperlink;
 
 /**

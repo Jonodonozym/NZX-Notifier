@@ -4,7 +4,9 @@
  * Created by Jaiden Baker on Jul 6, 2017 5:17:35 PM
  * Copyright © 2017. All rights reserved.
  * 
- * Last modified on Jul 17, 2017 1:46:41 PM
+ * Last modified on Nov 3, 2017 11:29:38 AM
+ * 
+ * Nov 3, 2017 11:29:41 AM - Fixed notification sound not playing
  */
 
 package jdz.NZXN.notification;
@@ -12,6 +14,7 @@ package jdz.NZXN.notification;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +133,8 @@ public class NotificationManager {
 	private static void playSound() {
 		try {
 			InputStream is = NotificationManager.class.getResourceAsStream(Resources.notificationSound);
-			AudioInputStream stream = AudioSystem.getAudioInputStream(is);
+			BufferedInputStream bis = new BufferedInputStream(is);
+			AudioInputStream stream = AudioSystem.getAudioInputStream(bis);
 
 			AudioFormat format = stream.getFormat();
 			DataLine.Info info = new DataLine.Info(Clip.class, format);
