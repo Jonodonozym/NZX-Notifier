@@ -35,7 +35,7 @@ import javax.swing.SwingConstants;
 
 import jdz.NZXN.config.Config;
 import jdz.NZXN.main.CheckAnnouncementsTask;
-import jdz.NZXN.webApi.NZXWebApi;
+import jdz.NZXN.webApi.nzx.NZXWebApi;
 
 @SuppressWarnings("serial")
 public class MainConfigPane extends JPanel{
@@ -75,9 +75,9 @@ public class MainConfigPane extends JPanel{
 	}
 	
 	private JLabel[] getTimeLabels(){
-		JLabel lastCheck =   new JLabel("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>" + timeFormat.format(CheckAnnouncementsTask.getLastCheck())+"</font>");
-		JLabel currentTime = new JLabel("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getCurrentTime())+"</font>");
-		nextCheck =   new JLabel("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getNextCheck())+"</font>");
+		JLabel lastCheck =   new JLabel("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getLastCheck())+"</font>");
+		JLabel currentTime = new JLabel("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getCurrentTime())+"</font>");
+		nextCheck =   new JLabel("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck())+"</font>");
 		
 
 		lastCheck.setAlignmentX(LEFT_ALIGNMENT);
@@ -86,18 +86,18 @@ public class MainConfigPane extends JPanel{
 		
 		nextCheck.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
 		
-		CheckAnnouncementsTask.addTaskAfterCheck(new Runnable() {
+		CheckAnnouncementsTask.getInstance().addTaskAfterCheck(new Runnable() {
 			@Override
 			public void run() {
-				lastCheck.setText("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>" + timeFormat.format(CheckAnnouncementsTask.getLastCheck())+"</font>");
-				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getNextCheck())+"</font>");
+				lastCheck.setText("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getLastCheck())+"</font>");
+				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck())+"</font>");
 			}
 		});
 		
-		CheckAnnouncementsTask.addTaskEachSecond(new Runnable() {
+		CheckAnnouncementsTask.getInstance().addTaskEachSecond(new Runnable() {
 			@Override
 			public void run() {
-				currentTime.setText("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getCurrentTime())+"</font>");
+				currentTime.setText("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getCurrentTime())+"</font>");
 			}
 		});
 		
@@ -115,7 +115,7 @@ public class MainConfigPane extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (NZXWebApi.instance.canConnect()){
-					CheckAnnouncementsTask.check();
+					CheckAnnouncementsTask.getInstance().check();
 					checkResults.setText("Checking now...");
 					new Timer().schedule(new TimerTask() {
 						@Override public void run() {
@@ -148,7 +148,7 @@ public class MainConfigPane extends JPanel{
 		spinner.getEditor().setPreferredSize(new Dimension(48,12));
 		spinner.addChangeListener((e) -> {
 				Config.getInstance().setInterval(spinnerModel.getNumber().intValue());
-				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getNextCheck())+"</font>");
+				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck())+"</font>");
 			});
 		
 		checkIntervalPanel.add(spinner);

@@ -86,7 +86,7 @@ public class ConfigWindow extends SysTrayFrame {
 		setContentPane(tabbedPane);
 
 		// auto-save the config before running a check
-		CheckAnnouncementsTask.addTaskBeforeCheck(new Runnable() {
+		CheckAnnouncementsTask.getInstance().addTaskBeforeCheck(new Runnable() {
 			@Override
 			public void run() {
 				saveConfig();

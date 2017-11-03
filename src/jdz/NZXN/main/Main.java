@@ -55,9 +55,9 @@ public class Main {
 		if (!argsList.contains("S"))
 			splashFrame = new SplashFrame();
 		
-		CheckAnnouncementsTask.start();
+		CheckAnnouncementsTask.getInstance().start();
 		ConfigWindow window = new ConfigWindow(false);
-		CheckAnnouncementsTask.check();
+		CheckAnnouncementsTask.getInstance().check();
 		if (argsList.contains("S"))
 			window.sendToTray(new WindowEvent(window, WindowEvent.WINDOW_ICONIFIED, 0, JFrame.ICONIFIED), false);
 		else{
