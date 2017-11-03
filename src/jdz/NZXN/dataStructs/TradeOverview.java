@@ -7,7 +7,7 @@
  * Jul 26, 2017 11:31:50 AM
  */
 
-package jdz.NZXN.structs;
+package jdz.NZXN.dataStructs;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,20 +17,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import jdz.NZXN.res.Fonts;
+import lombok.Data;
 
+@Data
 public class TradeOverview {
-	private final double price, buy, sell, volume, value;
+	private final double price, vwap, buy, sell, volume, value;
 	private final LocalDateTime time;
-	
-	public TradeOverview(double price, double buy, double sell, double volume, double value, LocalDateTime time){
-		this.price = price;
-		this.buy = buy;
-		this.sell = sell;
-		this.volume = volume;
-		this.value = value;
-		this.time = time;
-	}
-	
+
 	public JPanel toPanel(){
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
@@ -48,11 +41,11 @@ public class TradeOverview {
 			cons.gridy = 1;
 			panel.add(time, cons);
 
-			String[] headers = new String[]{ "Buy", "Sell", "Volume", "Value" };
-			String[] contents = new String[] {buy+"", sell+"", volume+"", "$"+value};
-			JLabel[] headerLabels = new JLabel[4];
-			JLabel[] headerContents = new JLabel[4];
-			for (int i=0; i<4; i++){
+			String[] headers = new String[]{ "VWAP", "Buy", "Sell", "Volume", "Value" };
+			String[] contents = new String[] {vwap+"", buy+"", sell+"", volume+"", "$"+value};
+			JLabel[] headerLabels = new JLabel[5];
+			JLabel[] headerContents = new JLabel[5];
+			for (int i=0; i<5; i++){
 				headerLabels[i] = new JLabel(headers[i]);
 				headerContents[i] = new JLabel(contents[i]);
 				headerLabels[i].setFont(Fonts.smallBoldFont);

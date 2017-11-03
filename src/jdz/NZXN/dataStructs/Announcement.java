@@ -7,7 +7,7 @@
  * Last modified on Jul 24, 2017 9:17:49 AM
  */
 
-package jdz.NZXN.structs;
+package jdz.NZXN.dataStructs;
 
 public class Announcement {
 	public final String company, companyURL, notification, url, type, time;
