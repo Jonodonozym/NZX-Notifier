@@ -38,10 +38,14 @@ import jdz.NZXN.utils.ExportFile;
  * @author Jaiden Baker
  */
 public class Config {
-	private static final Config instance = Config.loadConfig();
+	private static final Config instance = new Config();
 	
 	private Properties props;
 	private Map<String, List<ConfigChangeListener>> listeners = new HashMap<String, List<ConfigChangeListener>>();
+
+	private Config() {
+		reload();
+	}
 	
 	public static Config getInstance(){
 		return instance;
@@ -127,16 +131,15 @@ public class Config {
 	}
 	
 	// static method which creates a new Config instance from the config file in appdata
-	private static Config loadConfig(){
-		Config config = new Config();
+	public void reload(){
 		try {
-			config.props = new Properties();
-			config.props.load(new FileInputStream(getConfigFile()));
+			instance.props = new Properties();
+			instance.props.load(new FileInputStream(getConfigFile()));
 		} catch (IOException e) {
 			try {
 				getConfigFile().delete();
-				config.props = new Properties();
-				config.props.load(new FileInputStream(getConfigFile()));
+				instance.props = new Properties();
+				instance.props.load(new FileInputStream(getConfigFile()));
 				JOptionPane.showMessageDialog(new JFrame(), "The config file has been incorrectly modified, default config has been restored");
 			} catch (IOException e1) {
 				e.printStackTrace();
@@ -144,8 +147,6 @@ public class Config {
 				JOptionPane.showMessageDialog(new JFrame(), "Error loading the default config. Please contact support if the problem persists.");
 			}
 		}
-		
-		return config;
 	}
 	
 	// saves this config to the config file
@@ -162,7 +163,7 @@ public class Config {
 	}
 	
 	// get the config file from the appdata folder, creating a default config file if one doesn't exist
-	private static File getConfigFile(){
+	File getConfigFile(){
 		try {
 			String dirPath = System.getenv("APPDATA")+File.separator+"NZX Notifier";
 			String filePath = dirPath+File.separator+"Config.cfg";
