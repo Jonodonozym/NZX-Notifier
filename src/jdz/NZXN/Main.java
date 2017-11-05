@@ -7,7 +7,7 @@
  * Last modified on Jul 24, 2017 1:28:57 PM
  */
 
-package jdz.NZXN.main;
+package jdz.NZXN;
 
 import java.awt.Color;
 import java.awt.event.WindowEvent;
@@ -26,7 +26,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 
 import jdz.NZXN.gui.ConfigWindow;
-import jdz.NZXN.utils.SplashFrame;
+import jdz.NZXN.tasks.CheckAnnouncementsTask;
+import jdz.NZXN.utils.swing.SplashFrame;
 
 public class Main {
 	public static void main(String[] args){

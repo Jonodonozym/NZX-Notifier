@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import jdz.NZXN.utils.JHyperlink;
+import jdz.NZXN.utils.swing.JHyperlink;
 import jdz.NZXN.webApi.Websites;
 
 /**

@@ -30,7 +30,8 @@ import org.jsoup.select.Elements;
 
 import jdz.NZXN.config.Config;
 import jdz.NZXN.dataStructs.Announcement;
-import jdz.NZXN.utils.FileLogger;
+import jdz.NZXN.dataStructs.Announcement.AnnouncementFlag;
+import jdz.NZXN.utils.debugging.FileLogger;
 import jdz.NZXN.webApi.Websites;
 
 public class NZXWebApiImp implements NZXWebApi{
@@ -79,7 +80,7 @@ public class NZXWebApiImp implements NZXWebApi{
 		List<String> typeBlacklist = config.getTypeBlacklist();
 		List<String> descBlacklist = config.getDescBlacklist();
 
-		for (Element row : table.select("tr")) {
+		for (Element row : table.select("tbody").select("tr")) {
 			Elements cells = row.select("td");
 
 			if (cells.isEmpty())
@@ -87,7 +88,7 @@ public class NZXWebApiImp implements NZXWebApi{
 
 			// gets the announcement time
 			// stops processing if the time has already been checked
-			String dateText = cells.get(2).ownText();
+			String dateText = cells.select("td[data-title=Date]").select("span").first().ownText();
 			if (config.getLastCheck() != null) {
 				LocalDateTime date = LocalDateTime.parse(dateText.replaceAll("pm", "PM").replaceAll("am", "AM"),
 						formatter);
@@ -127,7 +128,14 @@ public class NZXWebApiImp implements NZXWebApi{
 			// url
 			String url = Websites.NZXsite + cells.select("td[data-title=Title]").select("span").select("a").attr("href");
 
-			announcements.add(new Announcement(company, companyURL, notification, url, type, dateText, false, false));
+			AnnouncementFlag flag = AnnouncementFlag.NONE;
+			Element flagCell = cells.select("td[data-title=Title]").first();
+			if (!flagCell.ownText().equals("P"))
+				flag = AnnouncementFlag.PRICE_SENSITIVE;
+			else if (!flagCell.ownText().equals("3"))
+				flag = AnnouncementFlag.THIRD_PARTY;
+			
+			announcements.add(new Announcement(company, companyURL, notification, url, type, dateText, flag));
 		}
 
 		return announcements;
@@ -150,7 +158,7 @@ public class NZXWebApiImp implements NZXWebApi{
 		for (Announcement a : announcements) {
 			Document doc;
 			try {
-				doc = Jsoup.connect(a.url).get();
+				doc = Jsoup.connect(a.getUrl()).get();
 			} catch (IOException e) {
 				return;
 			}
@@ -162,7 +170,7 @@ public class NZXWebApiImp implements NZXWebApi{
 				try {
 					String dirPath = new File(
 							new NZXWebApiImp().getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
-							+ File.separator + "Past Announcements" + File.separator + a.notification + ", " + a.time;
+							+ File.separator + "Past Announcements" + File.separator + a.getNotification() + "--" + a.getTime();
 					new File(dirPath).mkdir();
 					URL url = new URL("https://www.nzx.com" + fileURL);
 					InputStream in = url.openStream();

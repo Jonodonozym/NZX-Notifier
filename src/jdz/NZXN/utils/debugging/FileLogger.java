@@ -1,4 +1,4 @@
-package jdz.NZXN.utils;
+package jdz.NZXN.utils.debugging;
 
 import java.awt.Color;
 

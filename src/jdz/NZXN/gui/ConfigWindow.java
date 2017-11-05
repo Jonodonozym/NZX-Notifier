@@ -23,9 +23,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import jdz.NZXN.config.Config;
-import jdz.NZXN.main.CheckAnnouncementsTask;
 import jdz.NZXN.res.Resources;
-import jdz.NZXN.utils.SysTrayFrame;
+import jdz.NZXN.tasks.CheckAnnouncementsTask;
+import jdz.NZXN.utils.swing.SysTrayFrame;
 
 /**
  * A Window that allows the user to change the configuration for the NZX Notifier program

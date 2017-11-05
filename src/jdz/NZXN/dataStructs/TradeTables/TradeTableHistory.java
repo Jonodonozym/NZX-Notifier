@@ -1,5 +1,5 @@
 
-package jdz.NZXN.dataStructs;
+package jdz.NZXN.dataStructs.TradeTables;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import jdz.NZXN.utils.FileLogger;
+import jdz.NZXN.utils.debugging.FileLogger;
 import lombok.Getter;
 
 public class TradeTableHistory {

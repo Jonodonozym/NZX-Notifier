@@ -1,5 +1,5 @@
 
-package jdz.NZXN.utils;
+package jdz.NZXN.utils.swing;
 
 import java.awt.Color;
 import java.awt.Dimension;

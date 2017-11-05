@@ -30,7 +30,7 @@ import javax.swing.SwingUtilities;
 
 import jdz.NZXN.config.Config;
 import jdz.NZXN.res.Resources;
-import jdz.NZXN.utils.FileLogger;
+import jdz.NZXN.utils.debugging.FileLogger;
 
 /**
  * Static class that manages notifications by sorting them vertically on the bottom-right side

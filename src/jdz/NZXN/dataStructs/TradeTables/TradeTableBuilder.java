@@ -1,12 +1,12 @@
 
-package jdz.NZXN.dataStructs;
+package jdz.NZXN.dataStructs.TradeTables;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import jdz.NZXN.dataStructs.TradeOffer.TradeOfferType;
+import jdz.NZXN.dataStructs.TradeTables.TradeOffer.TradeOfferType;
 
 public class TradeTableBuilder {
 	private final String securityCode;

@@ -11,8 +11,8 @@ package jdz.NZXN.webApi.anz;
 
 import java.time.LocalDateTime;
 
-import jdz.NZXN.dataStructs.TradeOverview;
-import jdz.NZXN.dataStructs.TradeTable;
+import jdz.NZXN.dataStructs.TradeTables.TradeOverview;
+import jdz.NZXN.dataStructs.TradeTables.TradeTable;
 
 public interface ANZWebApi {
 	public static final ANZWebApi instance = new ANZWebApiImpl();

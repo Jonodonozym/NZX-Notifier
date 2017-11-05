@@ -34,7 +34,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 import jdz.NZXN.config.Config;
-import jdz.NZXN.main.CheckAnnouncementsTask;
+import jdz.NZXN.tasks.CheckAnnouncementsTask;
 import jdz.NZXN.webApi.nzx.NZXWebApi;
 
 @SuppressWarnings("serial")
@@ -116,7 +116,7 @@ public class MainConfigPane extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				if (NZXWebApi.instance.canConnect()){
 					CheckAnnouncementsTask.getInstance().check();
-					checkResults.setText("Checking now...");
+					checkResults.setText("Check complete.");
 					new Timer().schedule(new TimerTask() {
 						@Override public void run() {
 							checkResults.setText("");

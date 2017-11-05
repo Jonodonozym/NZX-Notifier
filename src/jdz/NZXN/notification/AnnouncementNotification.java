@@ -23,7 +23,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import jdz.NZXN.dataStructs.Announcement;
-import jdz.NZXN.utils.JHyperlink;
+import jdz.NZXN.dataStructs.Announcement.AnnouncementFlag;
+import jdz.NZXN.utils.swing.JHyperlink;
 
 /**
  * Notification class that displays announcements on the screen
@@ -82,15 +83,15 @@ public class AnnouncementNotification extends Notification {
 	    	if (i-- == 0)
 	    		break;
 	    	
-		    String l2Text = a.notification;
-		    if (a.isPriceSensitive)
-		    	l2Text = "<html><font color=#DE2700>(P) </font>"+a.notification+"</html>";
-		    if (a.isThirdParty)
-		    	l2Text = "<html>(3) "+a.notification+"</html>";
+		    String l2Text = a.getNotification();
+		    if (a.getFlag() == AnnouncementFlag.PRICE_SENSITIVE)
+		    	l2Text = "<html><font color=#DE2700>(P) </font>"+a.getNotification()+"</html>";
+		    if (a.getFlag() == AnnouncementFlag.THIRD_PARTY)
+		    	l2Text = "<html>(3) "+a.getNotification()+"</html>";
 		    
-		    col1.add(new JHyperlink(a.company, a.companyURL));
-		    col2.add(new JHyperlink(l2Text, a.url));
-		    col3.add(new JLabel(a.time));
+		    col1.add(new JHyperlink(a.getCompany(), a.getCompanyURL()));
+		    col2.add(new JHyperlink(l2Text, a.getUrl()));
+		    col3.add(new JLabel(a.getTime()));
 	    }
 
 	    // adding columns to the container, then to the content panel

@@ -7,7 +7,7 @@
  * Last modified on Jul 24, 2017 1:28:49 PM
  */
 
-package jdz.NZXN.main;
+package jdz.NZXN.tasks;
 
 import jdz.NZXN.config.Config;
 import jdz.NZXN.dataStructs.Announcement;

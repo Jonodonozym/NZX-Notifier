@@ -7,7 +7,7 @@
  * Last modified on Jul 6, 2017 5:05:08 PM
  */
 
-package jdz.NZXN.utils;
+package jdz.NZXN.utils.swing;
 
 import java.awt.Cursor;
 import java.awt.Desktop;

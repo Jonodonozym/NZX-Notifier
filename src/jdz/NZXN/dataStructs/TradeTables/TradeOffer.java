@@ -1,5 +1,5 @@
 
-package jdz.NZXN.dataStructs;
+package jdz.NZXN.dataStructs.TradeTables;
 
 import java.time.LocalTime;
 

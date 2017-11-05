@@ -7,7 +7,7 @@
  * Last modified on Nov 3, 2017 12:56:05 PM
  */
 
-package jdz.NZXN.dataStructs;
+package jdz.NZXN.dataStructs.TradeTables;
 
 import java.awt.GridLayout;
 import java.time.LocalDateTime;

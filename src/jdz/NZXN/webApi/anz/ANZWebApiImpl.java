@@ -27,10 +27,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import jdz.NZXN.dataStructs.TradeOverview;
-import jdz.NZXN.dataStructs.TradeTable;
-import jdz.NZXN.dataStructs.TradeTableBuilder;
-import jdz.NZXN.utils.FileLogger;
+import jdz.NZXN.dataStructs.TradeTables.TradeOverview;
+import jdz.NZXN.dataStructs.TradeTables.TradeTable;
+import jdz.NZXN.dataStructs.TradeTables.TradeTableBuilder;
+import jdz.NZXN.utils.debugging.FileLogger;
 import jdz.NZXN.webApi.Websites;
 import jdz.NZXN.webApi.nzx.NZXWebApi;
 

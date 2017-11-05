@@ -4,7 +4,7 @@
  * Created by Jaiden Baker on Nov 3, 2017 10:29:14 AM
  * Copyright © 2017. All rights reserved.
  * 
- * Last modified on Nov 3, 2017 11:30:00 AM
+ * Last modified on Nov 4, 2017 2:51:24 PM
  */
 
 package jdz.NZXN.config;
@@ -19,13 +19,14 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.Scanner;
 
-import jdz.NZXN.utils.FileLogger;
 import jdz.NZXN.utils.StringEncryptor;
+import jdz.NZXN.utils.debugging.FileLogger;
 
 public class PasswordVault {
 	private static final PasswordVault instance = new PasswordVault();
 	
 	private String ANZUsername = "", ANZPassword = "";
+	private boolean rememberPasswords = false;
 	
 	private PasswordVault() {
 		reload();
@@ -55,7 +56,10 @@ public class PasswordVault {
 			passFile.createNewFile();
 			
 			StringWriter sw = new StringWriter();
-			sw.append("ANZ == "+ANZUsername+" || "+ANZPassword);
+			sw.append("RememberPasswords == "+rememberPasswords+"\n");
+			if (rememberPasswords) {
+				sw.append("ANZ == "+ANZUsername+" || "+ANZPassword);
+			}
 			String encryptedData = StringEncryptor.encrypt(sw.toString());
 			sw.close();
 			
@@ -73,13 +77,19 @@ public class PasswordVault {
 		if (passFile.exists()){
 			try {
 				Scanner scanner = new Scanner(passFile);
-				String content = scanner.useDelimiter("\\Z").next();
+				String content = StringEncryptor.decrypt(scanner.useDelimiter("\\Z").next());
 				scanner.close();
-				String[] args = content.split(" == ")[1].split(" || ");
-				ANZUsername = args[0];
-				ANZPassword = args[1];
+				
+				String[] lines = content.split("\n");
+
+				rememberPasswords = Boolean.parseBoolean(lines[0].replaceFirst("RememberPasswords == ", ""));
+				if (rememberPasswords) {
+					String[] ANZArgs = lines[1].split(" == ")[1].split(" || ");
+					ANZUsername = ANZArgs[0];
+					ANZPassword = ANZArgs[1];
+				}
 			}
-			catch(IOException e) {
+			catch(IOException | GeneralSecurityException e) {
 				FileLogger.createErrorLog(e);
 			}
 		}

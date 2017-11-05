@@ -1,5 +1,5 @@
 
-package jdz.NZXN.dataStructs;
+package jdz.NZXN.dataStructs.TradeTables;
 
 import java.io.StringWriter;
 import java.time.Instant;
@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import jdz.NZXN.dataStructs.TradeOffer.TradeOfferType;
-import jdz.NZXN.utils.FileLogger;
+import jdz.NZXN.dataStructs.TradeTables.TradeOffer.TradeOfferType;
+import jdz.NZXN.utils.debugging.FileLogger;
 
 public class TradeTableFactory {
 	private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");

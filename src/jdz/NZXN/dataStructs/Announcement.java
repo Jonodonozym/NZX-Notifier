@@ -9,18 +9,16 @@
 
 package jdz.NZXN.dataStructs;
 
-public class Announcement {
-	public final String company, companyURL, notification, url, type, time;
-	public final boolean isPriceSensitive, isThirdParty;
+import lombok.Data;
 
-	public Announcement(String company, String companyURL, String notification, String url, String type, String time, boolean isPriceSensitive, boolean isThirdParty) {
-		this.company = company;
-		this.companyURL = companyURL;
-		this.notification = notification;
-		this.url = url;
-		this.type = type;
-		this.time = time;
-		this.isPriceSensitive = isPriceSensitive;
-		this.isThirdParty = isThirdParty;
+@Data
+public class Announcement {
+	private final String company, companyURL, notification, url, type, time;
+	private final AnnouncementFlag flag;
+	
+	public enum AnnouncementFlag{
+		NONE,
+		PRICE_SENSITIVE,
+		THIRD_PARTY;
 	}
 }

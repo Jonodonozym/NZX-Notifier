@@ -15,6 +15,8 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import jdz.NZXN.utils.debugging.FileLogger;
+
 public final class StringEncryptor {
 	private static final byte[] XORKey = "a7^ndj*oOhn%@l".getBytes();
 	private static final SecretKeySpec chiperKey = createSecretKey("aoid0oiw832dasf1".toCharArray(),

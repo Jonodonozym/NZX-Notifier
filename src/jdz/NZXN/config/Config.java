@@ -4,7 +4,7 @@
  * Created by Jaiden Baker on Jul 2, 2017 4:05:40 PM
  * Copyright © 2017. All rights reserved.
  * 
- * Last modified on Jul 18, 2017 11:21:22 AM
+ * Last modified on Nov 4, 2017 2:51:33 PM
  */
 
 package jdz.NZXN.config;
@@ -133,13 +133,13 @@ public class Config {
 	// static method which creates a new Config instance from the config file in appdata
 	public void reload(){
 		try {
-			instance.props = new Properties();
-			instance.props.load(new FileInputStream(getConfigFile()));
+			props = new Properties();
+			props.load(new FileInputStream(getConfigFile()));
 		} catch (IOException e) {
 			try {
 				getConfigFile().delete();
-				instance.props = new Properties();
-				instance.props.load(new FileInputStream(getConfigFile()));
+				props = new Properties();
+				props.load(new FileInputStream(getConfigFile()));
 				JOptionPane.showMessageDialog(new JFrame(), "The config file has been incorrectly modified, default config has been restored");
 			} catch (IOException e1) {
 				e.printStackTrace();

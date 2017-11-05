@@ -7,7 +7,7 @@
  * Last modified on Jul 13, 2017 6:08:43 AM
  */
 
-package jdz.NZXN.utils;
+package jdz.NZXN.utils.swing;
 
 import java.awt.*;
 import java.awt.event.*;

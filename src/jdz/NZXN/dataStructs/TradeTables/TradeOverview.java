@@ -7,7 +7,7 @@
  * Jul 26, 2017 11:31:50 AM
  */
 
-package jdz.NZXN.dataStructs;
+package jdz.NZXN.dataStructs.TradeTables;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

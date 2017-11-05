@@ -9,9 +9,7 @@
 
 package jdz.NZXN.webApi.nzx;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -35,6 +33,7 @@ import org.jsoup.select.Elements;
 
 import jdz.NZXN.config.Config;
 import jdz.NZXN.dataStructs.Announcement;
+import jdz.NZXN.dataStructs.Announcement.AnnouncementFlag;
 
 @Deprecated
 public class LegacyNZXWebApi {
@@ -106,8 +105,8 @@ public class LegacyNZXWebApi {
 			String type = cells.get(3).text();
 			String notification = cells.get(1).select("a").text();
 			String url = site+cells.get(1).select("a").attr("href");
-			boolean isPriceSensitive = cells.get(1).select("a").hasClass("announcement-flag price-sensitive");
-			boolean isThirdParty = cells.get(1).select("a").hasClass("announcement-flag third-party");
+			//boolean isPriceSensitive = cells.get(1).select("a").hasClass("announcement-flag price-sensitive");
+			//boolean isThirdParty = cells.get(1).select("a").hasClass("announcement-flag third-party");
 
 			boolean descWLContains = false;
 			for (String s : descWhitelist)
@@ -131,7 +130,7 @@ public class LegacyNZXWebApi {
 							|| descBLContains))
 				continue;
 
-			announcements.add(new Announcement(company, companyURL, notification, url, type, dateText, isPriceSensitive, isThirdParty));
+			announcements.add(new Announcement(company, companyURL, notification, url, type, dateText, AnnouncementFlag.NONE));
 		}
 
 		return announcements;
@@ -146,7 +145,7 @@ public class LegacyNZXWebApi {
 		for (Announcement a : announcements) {
 			Document doc;
 			try {
-				doc = Jsoup.connect(a.url).get();
+				doc = Jsoup.connect(a.getUrl()).get();
 			} catch (IOException e) {
 				return;
 			}
@@ -157,8 +156,8 @@ public class LegacyNZXWebApi {
 				String fileName = e.select("a").text() + fileURL.substring(fileURL.lastIndexOf("."));
 				try {
 					String dirPath = new File(
-							new LegacyNZXWebApi().getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
-							+ File.separator + "Past Announcements" + File.separator + a.notification + ", " + a.time;
+							LegacyNZXWebApi.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+							+ File.separator + "Past Announcements" + File.separator + a.getNotification() + "--" + a.getTime();
 					new File(dirPath).mkdir();
 					URL url = new URL("https://www.nzx.com" + fileURL);
 					InputStream in = url.openStream();
@@ -169,47 +168,6 @@ public class LegacyNZXWebApi {
 				}
 			}
 		}
-	}
-
-	public static void addToCSV(List<Announcement> announcements) {
-		try {
-			File csv = getCSVFile();
-			if (csv == null)
-				return;
-			BufferedWriter bw = new BufferedWriter(new FileWriter(csv, true));
-			for (Announcement a : announcements) {
-				bw.write(a.company + "," + "\"=HYPERLINK(\"\"" + a.url + "\"\",\"\"" + a.notification.replace(")", "").replace("(", "") + "\"\")\"" + ","
-						+ a.type + "," + a.time);
-				bw.newLine();
-			}
-			bw.flush();
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static File getCSVFile() {
-		try {
-			String dirPath = Paths.get(LegacyNZXWebApi.class.getProtectionDomain().getCodeSource().getLocation().toURI())
-					.toFile() + File.separator + "Past Announcements";
-			String pastAnnPath = dirPath + File.separator + "Past Announcements.csv";
-
-			new File(dirPath).mkdir();
-
-			File pastAnn = new File(pastAnnPath);
-			if (!pastAnn.exists()) {
-				pastAnn.createNewFile();
-				BufferedWriter bw = new BufferedWriter(new FileWriter(pastAnn, true));
-				bw.write("Security,Notification,Type,Date,Time");
-				bw.newLine();
-				bw.close();
-			}
-			return pastAnn;
-		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 	
 	public static boolean checkConnection(){

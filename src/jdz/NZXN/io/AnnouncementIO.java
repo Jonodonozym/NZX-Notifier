@@ -20,8 +20,8 @@ public class AnnouncementIO {
 				return;
 			BufferedWriter bw = new BufferedWriter(new FileWriter(csv, true));
 			for (Announcement a : announcements) {
-				bw.write(a.company + "," + "\"=HYPERLINK(\"\"" + a.url + "\"\",\"\"" + a.notification.replace(")", "").replace("(", "") + "\"\")\"" + ","
-						+ a.type + "," + a.time);
+				bw.write(a.getCompany() + "," + "\"=HYPERLINK(\"\"" + a.getUrl() + "\"\",\"\"" + a.getNotification().replace(")", "").replace("(", "") + "\"\")\"" + ","
+						+ a.getType() + "," + a.getTime()+","+a.getFlag());
 				bw.newLine();
 			}
 			bw.flush();
@@ -43,7 +43,7 @@ public class AnnouncementIO {
 			if (!pastAnn.exists()) {
 				pastAnn.createNewFile();
 				BufferedWriter bw = new BufferedWriter(new FileWriter(pastAnn, true));
-				bw.write("Security,Notification,Type,Date,Time");
+				bw.write("Security,Notification,Type,Date,Time,Flag");
 				bw.newLine();
 				bw.close();
 			}
