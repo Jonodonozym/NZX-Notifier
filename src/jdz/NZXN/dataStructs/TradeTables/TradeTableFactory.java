@@ -3,6 +3,7 @@ package jdz.NZXN.dataStructs.TradeTables;
 
 import java.io.StringWriter;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -16,16 +17,33 @@ import jdz.NZXN.utils.debugging.FileLogger;
 
 public class TradeTableFactory {
 	private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+	private static final DateTimeFormatter df = DateTimeFormatter.ofPattern("uuuu-MM-dd");
 
-	public static String toString(TradeTableHistory history) {
-		return ""; // TODO
+	static String toString(TradeTableHistory history) {
+		StringWriter sw = new StringWriter();
+		sw.append(history.getSecurityCode()+'\n');
+		sw.append(history.getDate().toString()+'\n');
+		for (TradeTable table: history.getTables()){
+			sw.append("TABLE"+'\n');
+			sw.append(toString(table));
+		}
+		sw.append("ENDOFHISTORY");
+		return sw.toString();
 	}
 	
-	public static TradeTableHistory tradeTableHistoryFromString(TradeTableHistory history) {
-		return null; // TODO
+	static TradeTableHistory parseHistory(Scanner s) {
+		String securityCode = s.nextLine();
+		LocalDate date = LocalDate.parse(s.nextLine(), df);
+		
+		TradeTableHistory history = new TradeTableHistory(securityCode, date);
+		
+		while(s.nextLine().equals("TABLE"))
+			history.add(parseTable(s));
+		
+		return history;
 	}
 	
-	public static String toString(TradeTable table) {
+	static String toString(TradeTable table) {
 		StringWriter sw = new StringWriter();
 		sw.append(table.getSecurityCode() + '\n');
 		sw.append(table.getCreationTime() + "" + '\n');
@@ -49,9 +67,7 @@ public class TradeTableFactory {
 		return sw.toString();
 	}
 
-	public static TradeTable fromString(String string) {
-		Scanner s = new Scanner(string);
-
+	private static TradeTable parseTable(Scanner s) {
 		String securityCode = s.nextLine();
 		LocalDateTime creationTime = Instant.ofEpochMilli(Long.parseLong(s.nextLine())).atZone(ZoneId.systemDefault())
 				.toLocalDateTime();

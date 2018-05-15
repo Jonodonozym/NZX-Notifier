@@ -12,12 +12,17 @@ import lombok.Getter;
 
 public class TradeTableHistory {
 	@Getter private final String securityCode;
-	@Getter private final LocalDate date = LocalDate.now();
+	@Getter private final LocalDate date;
 	private List<TradeTable> pastTables = new ArrayList<TradeTable>();
 	private List<TradeOffer> pastTrades = new ArrayList<TradeOffer>();
 	
 	public TradeTableHistory(String securityCode) {
+		this(securityCode, LocalDate.now());
+	}
+	
+	public TradeTableHistory(String securityCode, LocalDate date) {
 		this.securityCode = securityCode;
+		this.date = date;
 	}
 	
 	public void add(TradeTable table) {

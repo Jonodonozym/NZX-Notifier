@@ -28,44 +28,50 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 import javax.swing.SwingUtilities;
 
-import jdz.NZXN.config.Config;
+import jdz.NZXN.config.ConfigChangeListener;
+import jdz.NZXN.config.ConfigProperty;
 import jdz.NZXN.res.Resources;
 import jdz.NZXN.utils.debugging.FileLogger;
 
 /**
- * Static class that manages notifications by sorting them vertically on the bottom-right side
- * of the screen, automatically re-positioning them when a notification below others is closed.
+ * Static class that manages notifications by sorting them vertically on the
+ * bottom-right side
+ * of the screen, automatically re-positioning them when a notification below
+ * others is closed.
  * 
- * i.e. when closing b from  [ a ]
- *                           [ b ]
- *                           
- *      it becomes    [ big empty space ]
- *      					 [ a ]
- *      
- *      instead of           [ a ]
- *                    [ big empty space ]
+ * i.e. when closing b from [ a ]
+ * [ b ]
+ * 
+ * it becomes [ big empty space ]
+ * [ a ]
+ * 
+ * instead of [ a ]
+ * [ big empty space ]
  *
- * Also plays a soothing tune to lull the user to sleep when a notification is added
+ * Also plays a soothing tune to lull the user to sleep when a notification is
+ * added
  *
  * @author Jaiden Baker
  */
 public class NotificationManager {
 	private static List<Notification> notifications = new ArrayList<Notification>();
-	
+
 	private static Dimension screenSize = null;
 	private static int taskBarHeight, y, x;
 	private static final int yGap = 16;
 	private static final Timer detectScreenChange = new Timer();
-	static{
+
+	static {
 		detectScreenChange.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if (screenSize == null || !screenSize.equals(Toolkit.getDefaultToolkit().getScreenSize())){
+				if (screenSize == null || !screenSize.equals(Toolkit.getDefaultToolkit().getScreenSize())) {
 					screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-					taskBarHeight = Toolkit.getDefaultToolkit().getScreenSize().height - GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
+					taskBarHeight = Toolkit.getDefaultToolkit().getScreenSize().height
+							- GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
 					y = screenSize.height - taskBarHeight - yGap;
-					x = screenSize.width - Notification.width -yGap;
-					for(Notification n: notifications){
+					x = screenSize.width - Notification.width - yGap;
+					for (Notification n : notifications) {
 						y -= n.getHeight();
 						n.setLocation(x, y);
 						y -= yGap;
@@ -73,19 +79,25 @@ public class NotificationManager {
 				}
 			}
 		}, 0, 1000);
+
+		ConfigChangeListener.register(ConfigProperty.IS_MUTED, (newValue) -> {
+			for (Notification n : notifications)
+				n.setAlwaysOnTop(newValue);
+		});
 	}
 
 	/**
-	 * Takes a list of notifications and arranges them above any existing notifications, bottom to top
+	 * Takes a list of notifications and arranges them above any existing
+	 * notifications, bottom to top
+	 * 
 	 * @param notifications
 	 */
 	public static void add(List<Notification> notifications) {
 		if (notifications.isEmpty())
 			return;
-		Config config = Config.getInstance();
-		for (Notification n: notifications){
+		for (Notification n : notifications) {
 			NotificationManager.notifications.add(n);
-			n.setAlwaysOnTop(!config.getMuted());
+			n.setAlwaysOnTop(!ConfigProperty.IS_MUTED.get());
 			y -= n.getHeight();
 			n.setLocation(x, y);
 			y -= yGap;
@@ -93,41 +105,35 @@ public class NotificationManager {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				for (Notification n: notifications)
+				for (Notification n : notifications)
 					n.setVisible(true);
 			}
 		});
-		if (!config.getMuted())
+		if (!ConfigProperty.IS_MUTED.get())
 			playSound();
-	}
-	
-	/**
-	 * Deletes a notification
-	 * Automatically relocates floating notifications above it to right above the taskbar / other notifications
-	 * @param n
-	 */
-	public static void delete(Notification n){
-		int index = notifications.indexOf(n);
-		notifications.remove(index);
-		int dy = n.getHeight()+yGap;
-		for (int i=index; i<notifications.size(); i++){
-			Notification n2 = notifications.get(i);
-			n2.setLocation(x, n2.getY()+dy);
-		}
-		y += dy;
-	}
-	
-	/**
-	 * Sets all of the notifications to always be on top or not
-	 * @param alwaysOnTop
-	 */
-	public static void setAlwaysOnTop(boolean alwaysOnTop){
-		for(Notification n: notifications)
-			n.setAlwaysOnTop(alwaysOnTop);
 	}
 
 	/**
-	 * Summons demons from hell and unleashes them on the world, enacting judgment on sinners and saints alike
+	 * Deletes a notification
+	 * Automatically relocates floating notifications above it to right above the
+	 * taskbar / other notifications
+	 * 
+	 * @param n
+	 */
+	public static void delete(Notification n) {
+		int index = notifications.indexOf(n);
+		notifications.remove(index);
+		int dy = n.getHeight() + yGap;
+		for (int i = index; i < notifications.size(); i++) {
+			Notification n2 = notifications.get(i);
+			n2.setLocation(x, n2.getY() + dy);
+		}
+		y += dy;
+	}
+
+	/**
+	 * Summons demons from hell and unleashes them on the world, enacting judgment
+	 * on sinners and saints alike
 	 * Seriously, it's called playSound. What did you expect it to do?
 	 */
 	private static void playSound() {
@@ -142,6 +148,8 @@ public class NotificationManager {
 			clip.open(stream);
 			clip.start();
 		}
-		catch (Exception e) { FileLogger.createErrorLog(e); }
+		catch (Exception e) {
+			FileLogger.createErrorLog(e);
+		}
 	}
 }

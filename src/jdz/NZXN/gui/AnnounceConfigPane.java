@@ -33,9 +33,10 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
-import jdz.NZXN.config.Config;
+import jdz.NZXN.config.ConfigProperty;
 import jdz.NZXN.io.AnnouncementIO;
 import jdz.NZXN.res.Resources;
+import jdz.NZXN.utils.StringUtils;
 
 @SuppressWarnings("serial")
 public class AnnounceConfigPane extends JPanel{
@@ -43,7 +44,7 @@ public class AnnounceConfigPane extends JPanel{
 	private JTextArea[] textAreas;
 	private JCheckBox toggleAnnouncements, toggleAnnouncementSaving;
 
-	AnnounceConfigPane(ConfigWindow configWindow, Config config){
+	AnnounceConfigPane(ConfigWindow configWindow){
 
 		setLayout(new GridBagLayout());
 		final GridBagConstraints constraints = new GridBagConstraints();
@@ -87,7 +88,7 @@ public class AnnounceConfigPane extends JPanel{
 			textPanels[i].add(scrollPanel);
 		}
 		
-		reloadConfig(config);
+		reloadConfig();
 
 	    ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		String[] tooltips = {
@@ -139,31 +140,34 @@ public class AnnounceConfigPane extends JPanel{
 		add(buttonPanel,constraints);
 	}
 	
-	void reloadConfig(Config config){
-		toggleAnnouncements.setSelected(config.getAnnEnabled());
-		toggleAnnouncementSaving.setSelected(config.getAnnSaveEnabled());
+	void reloadConfig(){
+		toggleAnnouncements.setSelected(ConfigProperty.ANNOUNCEMENT_ALERTS_ENABLED.get());
+		toggleAnnouncementSaving.setSelected(ConfigProperty.ANNOUNCEMENT_SAVING_ENABLED.get());
 		
 		String[] defaultText = {
-				config.mergeList(config.getSecWhitelist(),"\n"),
-				config.mergeList(config.getDescWhitelist(),"\n"),
-				config.mergeList(config.getTypeWhitelist(),"\n"),
-				config.mergeList(config.getSecBlacklist(),"\n"),
-				config.mergeList(config.getDescBlacklist(),"\n"),
-				config.mergeList(config.getTypeBlacklist(),"\n")
+				StringUtils.mergeList(ConfigProperty.SECURITY_WHITELIST.get(),"\n"),
+				StringUtils.mergeList(ConfigProperty.DESCRIPTION_WHITELIST.get(),"\n"),
+				StringUtils.mergeList(ConfigProperty.TYPE_WHITELIST.get(),"\n"),
+				StringUtils.mergeList(ConfigProperty.SECURITY_BLACKLIST.get(),"\n"),
+				StringUtils.mergeList(ConfigProperty.DESCRIPTION_BLACKLIST.get(),"\n"),
+				StringUtils.mergeList(ConfigProperty.TYPE_BLACKLIST.get(),"\n")
 		};
+		
 		for (int i=0; i<6; i++)
 			textAreas[i].setText(defaultText[i]);
 		repaint();
 	}
 	
-	void saveConfig(Config config){
-		config.setAnnEnabled(toggleAnnouncements.isSelected());
-		config.setAnnSaveEnabled(toggleAnnouncementSaving.isSelected());
-		config.setSecWhitelist(Arrays.asList(textAreas[0].getText().replace(",","\n").split("\n")));
-		config.setDescWhitelist(Arrays.asList(textAreas[1].getText().replace(",","\n").split("\n")));
-		config.setTypeWhitelist(Arrays.asList(textAreas[2].getText().replace(",","\n").split("\n")));
-		config.setSecBlacklist(Arrays.asList(textAreas[3].getText().replace(",","\n").split("\n")));
-		config.setDescBlacklist(Arrays.asList(textAreas[4].getText().replace(",","\n").split("\n")));
-		config.setTypeBlacklist(Arrays.asList(textAreas[5].getText().replace(",","\n").split("\n")));
+	void saveConfig(){
+		ConfigProperty.ANNOUNCEMENT_ALERTS_ENABLED.set(toggleAnnouncements.isSelected());
+		ConfigProperty.ANNOUNCEMENT_SAVING_ENABLED.set(toggleAnnouncementSaving.isSelected());
+		ConfigProperty.SECURITY_WHITELIST.set(Arrays.asList(textAreas[0].getText().replace(",","\n").split("\n")));
+		ConfigProperty.DESCRIPTION_WHITELIST.set(Arrays.asList(textAreas[1].getText().replace(",","\n").split("\n")));
+		ConfigProperty.TYPE_WHITELIST.set(Arrays.asList(textAreas[2].getText().replace(",","\n").split("\n")));
+		ConfigProperty.SECURITY_BLACKLIST.set(Arrays.asList(textAreas[3].getText().replace(",","\n").split("\n")));
+		ConfigProperty.DESCRIPTION_BLACKLIST.set(Arrays.asList(textAreas[4].getText().replace(",","\n").split("\n")));
+		ConfigProperty.TYPE_BLACKLIST.set(Arrays.asList(textAreas[5].getText().replace(",","\n").split("\n")));
 	}
+	
+	
 }

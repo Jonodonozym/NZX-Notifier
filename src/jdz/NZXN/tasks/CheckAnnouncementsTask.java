@@ -9,7 +9,9 @@
 
 package jdz.NZXN.tasks;
 
-import jdz.NZXN.config.Config;
+import jdz.NZXN.config.FileConfiguration;
+import jdz.NZXN.config.ConfigChangeListener;
+import jdz.NZXN.config.ConfigProperty;
 import jdz.NZXN.dataStructs.Announcement;
 import jdz.NZXN.gui.ConfigWindow;
 import jdz.NZXN.io.AnnouncementIO;
@@ -19,6 +21,7 @@ import jdz.NZXN.notification.NotificationManager;
 import jdz.NZXN.notification.PriceNotification;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -27,55 +30,62 @@ import java.util.TimerTask;
 import jdz.NZXN.utils.ComparePrice;
 import jdz.NZXN.utils.SleepModeDetector;
 import jdz.NZXN.utils.SleepModeListener;
+import jdz.NZXN.utils.StringUtils;
 import jdz.NZXN.webApi.nzx.NZXWebApi;
 import lombok.Getter;
 
-public class CheckAnnouncementsTask implements SleepModeListener{
-	@Getter private static final CheckAnnouncementsTask instance = new CheckAnnouncementsTask();
-	
+public class CheckAnnouncementsTask implements SleepModeListener {
+	@Getter
+	private static final CheckAnnouncementsTask instance = new CheckAnnouncementsTask();
+
 	private TimerTask runningTask = null;
 	private Thread checkThread = null;
 	private List<Runnable> runBeforeCheck = new ArrayList<Runnable>();
 	private List<Runnable> runAfterCheck = new ArrayList<Runnable>();
 	private List<Runnable> runEachSecond = new ArrayList<Runnable>();
 	private int intervalSeconds = 300;
-	@Getter private int secondsSinceCheck = 0;
-	@Getter private LocalDateTime lastCheck = LocalDateTime.now();
-	
+	@Getter
+	private int secondsSinceCheck = 0;
+	@Getter
+	private long lastCheck = System.currentTimeMillis();
+
 	public CheckAnnouncementsTask() {
-		Config.getInstance().addListener("CheckIntervalMinutes", (e)->{
-			setIntervalMinutes(Integer.parseInt(e.getNewValue()));
-			});
+		ConfigChangeListener.register(ConfigProperty.CHECK_INTERVAL_MINUTES, (newValue)->{
+			setIntervalMinutes(newValue);
+		});
+
 		SleepModeDetector.addListener(this);
 	}
-	
-	public void start(){
+
+	public void start() {
 		if (runningTask != null)
 			throw new RuntimeException("Error: only 1 CheckAnnouncementsTask can exist at a time");
-		runningTask = new TimerTask(){
+		
+		runningTask = new TimerTask() {
 			@Override
 			public void run() {
 				if (++secondsSinceCheck >= intervalSeconds)
 					check();
-				for (Runnable r: runEachSecond)
+				for (Runnable r : runEachSecond)
 					r.run();
 			}
 		};
-		Config config = Config.getInstance();
-		intervalSeconds = config.getInterval()*60;
-		lastCheck = config.getLastCheck();
 		
+		intervalSeconds = ConfigProperty.CHECK_INTERVAL_MINUTES.get() * 60;
+		lastCheck = ConfigProperty.LAST_CHECK.get();
+
 		new Timer().schedule(runningTask, 1000, 1000);
 	}
-	
+
 	/**
-	 * Runs the check on a separate thread and makes sure only 1 check can be done at a time
+	 * Runs the check on a separate thread and makes sure only 1 check can be done
+	 * at a time
 	 */
-	public void check(){
-		if (checkThread == null){
-			checkThread = new Thread(){
+	public void check() {
+		if (checkThread == null) {
+			checkThread = new Thread() {
 				@Override
-				public void run(){
+				public void run() {
 					doCheck();
 					checkThread = null;
 				}
@@ -83,84 +93,96 @@ public class CheckAnnouncementsTask implements SleepModeListener{
 			checkThread.run();
 		}
 	}
-	
-	private void doCheck(){
-		for (Runnable r: runBeforeCheck)
+
+	private void doCheck() {
+		for (Runnable r : runBeforeCheck)
 			r.run();
 
-		Config config = Config.getInstance();
 		secondsSinceCheck = 0;
-		lastCheck = LocalDateTime.now();
-		if (NZXWebApi.instance.canConnect())
-		{
-			lastCheck = NZXWebApi.instance.getDateTime();
-			if (lastCheck == null)
-				lastCheck = LocalDateTime.now();
-			
+		lastCheck = System.currentTimeMillis();
+		if (NZXWebApi.instance.canConnect()) {
+			LocalDateTime lastCheckDateTime = NZXWebApi.instance.getDateTime();
+			if (lastCheckDateTime == null)
+				lastCheck = System.currentTimeMillis();
+			else
+				lastCheck = lastCheckDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+
 			List<Notification> notifications = new ArrayList<Notification>();
-			
-			if (config.getAnnEnabled()){
-				List<Announcement> a = NZXWebApi.instance.getMarketAnnouncements(config);
-				if (!a.isEmpty()){
-					if (config.getAnnSaveEnabled())
-							NZXWebApi.instance.downloadAttatchments(a);
+
+			if (ConfigProperty.ANNOUNCEMENT_ALERTS_ENABLED.get()) {
+				List<Announcement> a = NZXWebApi.instance.getMarketAnnouncements();
+				if (!a.isEmpty()) {
+					if (ConfigProperty.ANNOUNCEMENT_SAVING_ENABLED.get())
+						NZXWebApi.instance.downloadAttatchments(a);
 					AnnouncementIO.addToCSV(a);
 					notifications.add(new AnnouncementNotification(a));
 				}
 			}
-			
-			if (config.getPriceEnabled()){
-				List<String> prices = config.getPriceAlerts();
+
+			if (ConfigProperty.PRICE_ALERTS_ENABLED.get()) {
+				List<String> prices = ConfigProperty.PRICE_ALERTS.get();
 				List<String> toRemove = new ArrayList<String>();
 				List<String> toAdd = new ArrayList<String>();
-				for (String s: prices){
-					List<String> args = Config.parseList(s, ":");
+				for (String s : prices) {
+					List<String> args = StringUtils.parseList(s, ":");
 					if (args.get(0).length() != 3)
 						continue;
-					
+
 					try {
 						float value = NZXWebApi.instance.getSecurityValue(args.get(0));
 						float currentValue = Float.parseFloat(args.get(2));
-						if (ComparePrice.checkPrice(currentValue, value, args.get(1))){
+						if (ComparePrice.checkPrice(currentValue, value, args.get(1))) {
 							toRemove.add(s);
 							if (args.get(1).equals("Any change"))
-								toAdd.add(args.get(0)+":"+args.get(1)+":"+value);
+								toAdd.add(args.get(0) + ":" + args.get(1) + ":" + value);
 							notifications.add(new PriceNotification(args.get(0), value, currentValue));
 						}
-					} catch (NumberFormatException e) { }
-					
+					} catch (NumberFormatException e) {
+					}
+
 				}
 				prices.removeAll(toRemove);
 				prices.addAll(toAdd);
-				config.setPriceAlerts(prices);
+				ConfigProperty.PRICE_ALERTS.set(prices);
 			}
 			NotificationManager.add(notifications);
-			config.setLastCheck(lastCheck);
+			ConfigProperty.LAST_CHECK.set(lastCheck);
 		}
-		
-		config.save();
+
+		FileConfiguration.save();
 		if (ConfigWindow.currentWindow != null)
 			ConfigWindow.currentWindow.reloadConfig();
-		for (Runnable r: runAfterCheck)
+		for (Runnable r : runAfterCheck)
 			r.run();
 	}
-	
-	public void setIntervalMinutes(int minutes){ intervalSeconds = minutes*60; }
-	public void addTaskBeforeCheck(Runnable r){ runBeforeCheck.add(r); }
-	public void addTaskAfterCheck(Runnable r){ runAfterCheck.add(r); }
-	public void addTaskEachSecond(Runnable r){ runEachSecond.add(r); }
 
-	public LocalDateTime getCurrentTime() {
-		return lastCheck.plusSeconds(secondsSinceCheck);
+	public void setIntervalMinutes(int minutes) {
+		intervalSeconds = minutes * 60;
 	}
 
-	public LocalDateTime getNextCheck() {
-		return lastCheck.plusSeconds(intervalSeconds);
+	public void addTaskBeforeCheck(Runnable r) {
+		runBeforeCheck.add(r);
+	}
+
+	public void addTaskAfterCheck(Runnable r) {
+		runAfterCheck.add(r);
+	}
+
+	public void addTaskEachSecond(Runnable r) {
+		runEachSecond.add(r);
+	}
+
+	public long getCurrentTime() {
+		return lastCheck + 1000 * secondsSinceCheck;
+	}
+
+	public long getNextCheck() {
+		return lastCheck + 1000 * intervalSeconds;
 	}
 
 	@Override
 	public void onDeviceWake() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

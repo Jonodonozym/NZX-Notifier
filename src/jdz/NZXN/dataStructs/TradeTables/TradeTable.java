@@ -13,7 +13,9 @@ import java.awt.GridLayout;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -23,19 +25,16 @@ import javax.swing.SwingConstants;
 
 import lombok.Getter;
 
-@Getter
+
 public class TradeTable{
-	private final String securityCode;
-	private final TradeOverview overview;
+	@Getter private final String securityCode;
+	@Getter private final TradeOverview overview;
 	private final List<TradeOffer> bids;
 	private final List<TradeOffer> asks;
 	private final List<TradeOffer> pastTrades;
-	private final LocalDateTime creationTime;
+	@Getter private final LocalDateTime creationTime;
 	
-	// Mathematical constants
-	private final double bidWeightedVolume;
-	private final double askWeightedVolume;
-	private final double bidAskWeightedVolumeRatio;
+	private final Map<SecurityMetric, Double> metrics = new HashMap<SecurityMetric, Double>(SecurityMetric.values().length);
 	
 	TradeTable(String securityCode, TradeOverview overview, List<TradeOffer> bids, List<TradeOffer> asks, List<TradeOffer> pastTrades, LocalDateTime creationTime) {
 		this.securityCode = securityCode;
@@ -45,26 +44,16 @@ public class TradeTable{
 		this.pastTrades = pastTrades;
 		this.creationTime = creationTime;
 		
-		bidWeightedVolume = calculateWeightedVolume(true);
-		askWeightedVolume = calculateWeightedVolume(false);
-		this.bidAskWeightedVolumeRatio = askWeightedVolume - bidWeightedVolume;
+		for (SecurityMetric metric: SecurityMetric.values())
+			metrics.put(metric, metric.calculate(this));
 	}
 
 	TradeTable(String securityCode, TradeOverview overview, List<TradeOffer> bids, List<TradeOffer> asks, List<TradeOffer> pastTrades) {
 		this(securityCode, overview, bids, asks, pastTrades, LocalDateTime.now());
 	}
 	
-	private double calculateWeightedVolume(boolean b) {
-		double totalWeightedVolume = 0;
-		
-		double limit = b?overview.getBuy():overview.getSell();
-		
-		for(TradeOffer o: b?bids:asks) {
-			double deviation = Math.abs(limit-o.getPrice());
-			totalWeightedVolume += o.getVolume() / deviation+1;
-		}
-		
-		return totalWeightedVolume / overview.getValue();
+	public double getMetric(SecurityMetric metric) {
+		return metrics.get(metric);
 	}
 	
 	public List<TradeOffer> getTrades() {

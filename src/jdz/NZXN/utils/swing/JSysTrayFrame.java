@@ -23,14 +23,14 @@ import javax.swing.JFrame;
  */
 
 @SuppressWarnings("serial")
-public class SysTrayFrame extends JFrame{
+public class JSysTrayFrame extends JFrame{
     TrayIcon trayIcon;
     SystemTray tray;
     Container contentPane;
     String minimizeMessage;
     PopupMenu popup;
     
-    public SysTrayFrame(String title, String minimizeMessage, Container contentPane, Image frameIcon){
+    public JSysTrayFrame(String title, String minimizeMessage, Container contentPane, Image frameIcon){
         super(title);
         this.minimizeMessage = minimizeMessage;
         
@@ -50,7 +50,8 @@ public class SysTrayFrame extends JFrame{
             trayIcon.setImageAutoSize(true);
             
             trayIcon.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
+                @Override
+				public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
                         setVisible(true);
                     	setExtendedState(NORMAL);
@@ -60,7 +61,8 @@ public class SysTrayFrame extends JFrame{
         }
         
         addWindowStateListener(new WindowStateListener() {
-            public void windowStateChanged(WindowEvent e) {
+            @Override
+			public void windowStateChanged(WindowEvent e) {
                 sendToTray(e);
             }
         });
@@ -69,7 +71,8 @@ public class SysTrayFrame extends JFrame{
 		
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            @Override
+			public void windowClosing(WindowEvent e) {
             	exit();
             }
         });

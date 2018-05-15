@@ -80,6 +80,7 @@ public class PricePanel extends JPanel{
 		return new PricePanel(args[0],args[1],Double.parseDouble(args[2]),parent);
 	}
 	
+	@Override
 	public String toString(){
 		return security.getText().toUpperCase()+":"+operator.getSelectedItem()+":"+df.format(price.getValue());
 	}

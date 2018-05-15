@@ -23,9 +23,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import jdz.NZXN.res.Resources;
+import jdz.NZXN.utils.swing.JImagePanel;
 
 /**
  * Abstract Notification class. This JDialog displays a container with the nxz logo, the title and
@@ -68,19 +70,12 @@ public abstract class Notification extends JDialog {
 		titlePanel.setMaximumSize(new Dimension(1024,Resources.bannerImage.getHeight()+border*2));
 
 		// displaying the logo
-		JPanel imagePanel = new JPanel() {
-			@Override
-			protected void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				g.drawImage(Resources.bannerImage, 0, 0, null);
-			}
-		};
-		imagePanel.setPreferredSize(new Dimension(Resources.bannerImage.getWidth(), Resources.bannerImage.getHeight()));
+		JImagePanel imagePanel = new JImagePanel(Resources.bannerImage);
 
 		// displaying the title of the notification panel
 		JLabel titleLabel = new JLabel("<html><div style='text-align: center;'>" + contents.getName() + "</div></html>");
 		titleLabel.setFont(topFont);
-		titleLabel.setHorizontalAlignment(JLabel.CENTER);
+		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 		// close button
 		final JButton closeButton = new JButton(new AbstractAction("x") {

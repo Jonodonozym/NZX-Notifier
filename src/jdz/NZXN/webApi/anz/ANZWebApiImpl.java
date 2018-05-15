@@ -17,6 +17,8 @@ import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.jsoup.Connection;
@@ -42,10 +44,12 @@ class ANZWebApiImpl implements ANZWebApi{
 	
 	private final DateTimeFormatter tradeTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 	
+	private final List<ANZLoginListener> listeners = new ArrayList<ANZLoginListener>();
+	
 	private Response loginSession = null;
 	
 	@Override
-	public void login(String username, String password){
+	public boolean login(String username, String password){
 		try {
 	        Connection con = Jsoup.connect(Websites.ANZloginURL);
 	        String __VIEWSTATE = con.get().select("input[name=__VIEWSTATE]").first().attr("value");
@@ -58,10 +62,18 @@ class ANZWebApiImpl implements ANZWebApi{
 	                .data("btnSignon","Login")
 	                .method(Method.POST)
 	                .execute();
-
-			setDefaultView(ANZView.DEPTH);
+			
+			boolean successful = isLoggedIn();
+			if (successful)
+				setDefaultView(ANZView.DEPTH);
+			
+			for (ANZLoginListener l: listeners)
+				l.onLoginAttempt(successful);
+			
+			return successful;
 		} catch (IOException e) {
 			FileLogger.createErrorLog(e);
+			return false;
 		}
 	}
 
@@ -115,6 +127,7 @@ class ANZWebApiImpl implements ANZWebApi{
 		return null;
 	}
 	
+	@Override
 	public TradeOverview getOverview(String securityCode) {
 		try{
 			if (isLoggedIn()){
@@ -209,5 +222,15 @@ class ANZWebApiImpl implements ANZWebApi{
 		}
 		catch (IOException e) { FileLogger.createErrorLog(e); }
 		return null;
+	}
+
+	@Override
+	public void addLoginListener(ANZLoginListener l) {
+		listeners.add(l);
+	}
+
+	@Override
+	public void removeLoginListener(ANZLoginListener l) {
+		listeners.remove(l);
 	}
 }

@@ -21,8 +21,9 @@ public interface ANZWebApi {
 	 * Attempts to login
 	 * @param username
 	 * @param password
+	 * @return true if the login attempt was successful
 	 */
-	public void login(String username, String password);
+	public boolean login(String username, String password);
 	
 	/**
 	 * Checks if the WebApi is currently logged
@@ -62,4 +63,16 @@ public interface ANZWebApi {
 	 * @return
 	 */
 	public float getTradingBalance();
+	
+	/**
+	 * Adds a login listener
+	 * @param l
+	 */
+	public void addLoginListener(ANZLoginListener l);
+	
+	/**
+	 * Removes a login listener
+	 * @param l
+	 */
+	public void removeLoginListener(ANZLoginListener l);
 }

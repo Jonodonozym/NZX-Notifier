@@ -48,7 +48,8 @@ public class AnnouncementNotification extends Notification {
     displayContents();
   }
 
-  protected JPanel getNotificationPanel(){
+  @Override
+protected JPanel getNotificationPanel(){
 	  
 	  	// initializing content panel
 	    JPanel contentPanel = new JPanel();

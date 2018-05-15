@@ -1,23 +1,14 @@
 
 package jdz.NZXN.config;
 
-public class ConfigChangeEvent {
-	private final String property;
-	private final String oldValue;
-	private final String newValue;
-	public ConfigChangeEvent(String property, String oldValue, String newValue){
-		this.property = property;
-		this.oldValue = oldValue;
-		this.newValue = newValue;
-	}
-	
-	public String getProperty(){
-		return property;
-	}
-	public String getOldValue(){
-		return oldValue;
-	}
-	public String getNewValue(){
-		return newValue;
-	}
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+public class ConfigChangeEvent<E> {
+	private final ConfigProperty<E> property;
+	private final E oldValue;
+	private final E newValue;
 }

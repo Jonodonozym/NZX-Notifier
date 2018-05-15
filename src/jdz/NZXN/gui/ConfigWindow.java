@@ -12,6 +12,7 @@ package jdz.NZXN.gui;
 import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.MenuItem;
 import java.awt.Toolkit;
 import java.awt.event.ItemEvent;
@@ -22,10 +23,11 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import jdz.NZXN.config.Config;
+import jdz.NZXN.config.ConfigChangeListener;
+import jdz.NZXN.config.ConfigProperty;
 import jdz.NZXN.res.Resources;
 import jdz.NZXN.tasks.CheckAnnouncementsTask;
-import jdz.NZXN.utils.swing.SysTrayFrame;
+import jdz.NZXN.utils.swing.JSysTrayFrame;
 
 /**
  * A Window that allows the user to change the configuration for the NZX Notifier program
@@ -34,11 +36,12 @@ import jdz.NZXN.utils.swing.SysTrayFrame;
  * @author Jaiden Baker
  */
 @SuppressWarnings("serial")
-public class ConfigWindow extends SysTrayFrame {
+public class ConfigWindow extends JSysTrayFrame {
 	public static ConfigWindow currentWindow = null;
 	private MainConfigPane mainConfig;
 	private PriceConfigPane priceConfig;
 	private AnnounceConfigPane announceConfig;
+	private ANZLoginPanel ANZLogin;
 
 	/**
 	 * Creates and displays a config window
@@ -53,13 +56,11 @@ public class ConfigWindow extends SysTrayFrame {
 		super("NZX Notifier",
 				"The NZX Notifier is still running. " + "Double click this icon to re-open the config window.",
 				new JPanel(), Resources.appIcon);
-
-		Config config = Config.getInstance();
         
         MenuItem configureItem = new MenuItem("Configure");
         configureItem.addActionListener((a)->{
                 setVisible(true);
-                setExtendedState(JFrame.NORMAL);
+                setExtendedState(Frame.NORMAL);
             });
         addSysTrayMenuItem(configureItem);
         
@@ -69,19 +70,22 @@ public class ConfigWindow extends SysTrayFrame {
 		setResizable(false);
 		currentWindow = this;
 
-		mainConfig = new MainConfigPane(this, config);
-		priceConfig = new PriceConfigPane(this, config);
-		announceConfig = new AnnounceConfigPane(this, config);
+		mainConfig = new MainConfigPane(this);
+		priceConfig = new PriceConfigPane(this);
+		announceConfig = new AnnounceConfigPane(this);
+		ANZLogin = new ANZLoginPanel(this);
 
-        CheckboxMenuItem muteItem = new CheckboxMenuItem("Mute", config.getMuted());
-        muteItem.addItemListener((l)->{Config.getInstance().setMuted(l.getStateChange() == ItemEvent.SELECTED);});
-        config.addListener("isMuted", (e)->{muteItem.setState(Boolean.parseBoolean(e.getNewValue()));});
+        CheckboxMenuItem muteItem = new CheckboxMenuItem("Mute", ConfigProperty.IS_MUTED.get());
+        muteItem.addItemListener((l)->{ConfigProperty.IS_MUTED.set(l.getStateChange() == ItemEvent.SELECTED);});
+        ConfigChangeListener.register(ConfigProperty.IS_MUTED, (newValue)->{muteItem.setState(newValue);});
+        addSysTrayMenuItem(muteItem);
 
 		// adding each panel to a tabbed frame
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.add("Main Config", mainConfig);
 		tabbedPane.add("Announcement Filters", announceConfig);
 		tabbedPane.add("Price Alerts", priceConfig);
+		tabbedPane.add("ANZ", ANZLogin);
 
 		setContentPane(tabbedPane);
 
@@ -95,6 +99,7 @@ public class ConfigWindow extends SysTrayFrame {
 
 		// auto-save when the program is closed
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			@Override
 			public void run() {
 				saveConfig();
 			}
@@ -117,21 +122,18 @@ public class ConfigWindow extends SysTrayFrame {
 	 * Takes the config from this window and saves it externally
 	 */
 	public void saveConfig() {
-		Config config = Config.getInstance();
-		mainConfig.saveConfig(config);
-		announceConfig.saveConfig(config);
-		priceConfig.saveConfig(config);
-		config.save();
+		mainConfig.saveConfig();
+		announceConfig.saveConfig();
+		priceConfig.saveConfig();
 	}
 	
 	/**
 	 * Loads the external config and update the window's contents to match
 	 */
 	public void reloadConfig(){
-		Config config = Config.getInstance();
-		mainConfig.reloadConfig(config);
-		announceConfig.reloadConfig(config);
-		priceConfig.reloadConfig(config);
+		mainConfig.reloadConfig();
+		announceConfig.reloadConfig();
+		priceConfig.reloadConfig();
 	}
 
 	/**

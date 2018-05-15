@@ -16,7 +16,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.time.format.DateTimeFormatter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,78 +34,87 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-import jdz.NZXN.config.Config;
+import jdz.NZXN.config.ConfigChangeListener;
+import jdz.NZXN.config.ConfigProperty;
 import jdz.NZXN.tasks.CheckAnnouncementsTask;
 import jdz.NZXN.webApi.nzx.NZXWebApi;
 
 @SuppressWarnings("serial")
-public class MainConfigPane extends JPanel{
+public class MainConfigPane extends JPanel {
 	private int border = 16;
 	private SpinnerNumberModel spinnerModel;
 	private JLabel nextCheck;
 	private JCheckBox isMutedCheckbox;
-	private DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("dd MMMM, hh:mm:ss");
+	private DateFormat timeFormat = new SimpleDateFormat("dd MMMM, hh:mm:ss");
 
-	MainConfigPane(ConfigWindow configWindow, Config config){
-		setBorder(BorderFactory.createEmptyBorder(border, border, border/2, border));
+	MainConfigPane(ConfigWindow configWindow) {
+		setBorder(BorderFactory.createEmptyBorder(border, border, border / 2, border));
 		setLayout(new BorderLayout());
-		
+
 		JPanel MainContents = new JPanel();
 		MainContents.setLayout(new BoxLayout(MainContents, BoxLayout.Y_AXIS));
-		
-		for (JLabel l: getTimeLabels())
+
+		for (JLabel l : getTimeLabels())
 			MainContents.add(l);
-		
+
 		MainContents.add(getCheckNowPanel());
-		
+
 		MainContents.add(Box.createVerticalStrut(6));
 		MainContents.add(new JSeparator(SwingConstants.HORIZONTAL));
 		MainContents.add(Box.createVerticalStrut(6));
 
-		for (JComponent c: getConfigComponents(configWindow, config))
+		for (JComponent c : getConfigComponents(configWindow))
 			MainContents.add(c);
-			
-		add(MainContents,BorderLayout.PAGE_START);
-		
+
+		add(MainContents, BorderLayout.PAGE_START);
+
 		JPanel noticePanel = new JPanel();
 		JLabel copyrightNotice = new JLabel("Copyright © Jaiden Baker 2017. All rights reserved.");
 		noticePanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		noticePanel.add(copyrightNotice);
-		this.add(noticePanel,BorderLayout.PAGE_END);
-		
+		this.add(noticePanel, BorderLayout.PAGE_END);
+
 	}
-	
-	private JLabel[] getTimeLabels(){
-		JLabel lastCheck =   new JLabel("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getLastCheck())+"</font>");
-		JLabel currentTime = new JLabel("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getCurrentTime())+"</font>");
-		nextCheck =   new JLabel("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck())+"</font>");
-		
+
+	private JLabel[] getTimeLabels() {
+		JLabel lastCheck = new JLabel(
+				"<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>"
+						+ timeFormat.format(CheckAnnouncementsTask.getInstance().getLastCheck()) + "</font>");
+		JLabel currentTime = new JLabel("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>"
+				+ timeFormat.format(CheckAnnouncementsTask.getInstance().getCurrentTime()) + "</font>");
+		nextCheck = new JLabel("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>"
+				+ timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck()) + "</font>");
+
 
 		lastCheck.setAlignmentX(LEFT_ALIGNMENT);
 		currentTime.setAlignmentX(LEFT_ALIGNMENT);
 		nextCheck.setAlignmentX(LEFT_ALIGNMENT);
-		
+
 		nextCheck.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
-		
+
 		CheckAnnouncementsTask.getInstance().addTaskAfterCheck(new Runnable() {
 			@Override
 			public void run() {
-				lastCheck.setText("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getLastCheck())+"</font>");
-				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck())+"</font>");
+				lastCheck
+						.setText("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>"
+								+ timeFormat.format(CheckAnnouncementsTask.getInstance().getLastCheck()) + "</font>");
+				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>"
+						+ timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck()) + "</font>");
 			}
 		});
-		
+
 		CheckAnnouncementsTask.getInstance().addTaskEachSecond(new Runnable() {
 			@Override
 			public void run() {
-				currentTime.setText("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getCurrentTime())+"</font>");
+				currentTime.setText("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>"
+						+ timeFormat.format(CheckAnnouncementsTask.getInstance().getCurrentTime()) + "</font>");
 			}
 		});
-		
-		return new JLabel[]{ lastCheck, currentTime, nextCheck };
+
+		return new JLabel[] { lastCheck, currentTime, nextCheck };
 	}
-	
-	private JPanel getCheckNowPanel(){
+
+	private JPanel getCheckNowPanel() {
 		JPanel checkNowPanel = new JPanel();
 		JLabel checkResults = new JLabel("");
 		if (!NZXWebApi.instance.canConnect())
@@ -114,16 +124,19 @@ public class MainConfigPane extends JPanel{
 		checkNow.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (NZXWebApi.instance.canConnect()){
+				if (NZXWebApi.instance.canConnect()) {
+					checkResults.setText("Checking now...");
+					repaint();
 					CheckAnnouncementsTask.getInstance().check();
-					checkResults.setText("Check complete.");
+					checkResults.setText("Check completed");
 					new Timer().schedule(new TimerTask() {
-						@Override public void run() {
+						@Override
+						public void run() {
 							checkResults.setText("");
 						}
 					}, 10000);
 				}
-				else{
+				else {
 					checkResults.setText("<html><font color=#DE2700>Error: no connection to the NZX website</font>");
 				}
 			}
@@ -131,11 +144,11 @@ public class MainConfigPane extends JPanel{
 		checkNowPanel.add(checkNow);
 		checkNowPanel.add(checkResults);
 		checkNowPanel.setAlignmentX(LEFT_ALIGNMENT);
-		
+
 		return checkNowPanel;
 	}
-	
-	private JComponent[] getConfigComponents(ConfigWindow configWindow, Config config){
+
+	private JComponent[] getConfigComponents(ConfigWindow configWindow) {
 		JPanel checkIntervalPanel = new JPanel();
 		FlowLayout checkIntervalLayout = new FlowLayout(FlowLayout.LEFT);
 		checkIntervalLayout.setHgap(0);
@@ -143,35 +156,42 @@ public class MainConfigPane extends JPanel{
 		JLabel checkIntervalLabel = new JLabel("Check Interval (Minutes)");
 		checkIntervalLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
 		checkIntervalPanel.add(checkIntervalLabel);
-		spinnerModel = new SpinnerNumberModel(config.getInterval(), 1, Integer.MAX_VALUE, 1);
+		spinnerModel = new SpinnerNumberModel((int) ConfigProperty.CHECK_INTERVAL_MINUTES.get(), 1, 1440, 1);
 		JSpinner spinner = new JSpinner(spinnerModel);
-		spinner.getEditor().setPreferredSize(new Dimension(48,12));
+		spinner.getEditor().setPreferredSize(new Dimension(48, 12));
 		spinner.addChangeListener((e) -> {
-				Config.getInstance().setInterval(spinnerModel.getNumber().intValue());
-				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>" + timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck())+"</font>");
-			});
-		
+			ConfigProperty.CHECK_INTERVAL_MINUTES.set(spinnerModel.getNumber().intValue());
+			nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>"
+					+ timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck()) + "</font>");
+		});
+		ConfigChangeListener.register(ConfigProperty.CHECK_INTERVAL_MINUTES, (newValue) -> {
+			spinnerModel.setValue(newValue);
+		});
+
 		checkIntervalPanel.add(spinner);
 		checkIntervalPanel.setAlignmentX(LEFT_ALIGNMENT);
-		
+
 		isMutedCheckbox = new JCheckBox("Silent mode");
-		isMutedCheckbox.setToolTipText("<html><p width=\"256\">If selected, notifications will no longer stay on top of other windows or play sounds. </p></html>");
+		isMutedCheckbox.setToolTipText(
+				"<html><p width=\"256\">If selected, notifications will no longer stay on top of other windows or play sounds. </p></html>");
 		isMutedCheckbox.setBackground(Color.white);
-		isMutedCheckbox.addItemListener((e)->{
-			Config.getInstance().setMuted(e.getStateChange() == ItemEvent.SELECTED);
+		isMutedCheckbox.addItemListener((e) -> {
+			ConfigProperty.IS_MUTED.set(e.getStateChange() == ItemEvent.SELECTED);
 		});
-		Config.getInstance().addListener("isMuted", (e)->{isMutedCheckbox.setSelected(Boolean.parseBoolean(e.getNewValue()));});
-		
-		return new JComponent[]{checkIntervalPanel, isMutedCheckbox};
+		ConfigChangeListener.register(ConfigProperty.IS_MUTED, (newValue) -> {
+			isMutedCheckbox.setSelected(newValue);
+		});
+
+		return new JComponent[] { checkIntervalPanel, isMutedCheckbox };
 	}
-	
-	void reloadConfig(Config config){
-		spinnerModel.setValue(config.getInterval());
-		isMutedCheckbox.setSelected(config.getMuted());
+
+	void reloadConfig() {
+		spinnerModel.setValue(ConfigProperty.CHECK_INTERVAL_MINUTES.get());
+		isMutedCheckbox.setSelected(ConfigProperty.IS_MUTED.get());
 	}
-	
-	void saveConfig(Config config){
-		config.setInterval(spinnerModel.getNumber().intValue());
-		config.setMuted(isMutedCheckbox.isSelected());
+
+	void saveConfig() {
+		ConfigProperty.CHECK_INTERVAL_MINUTES.set(spinnerModel.getNumber().intValue());
+		ConfigProperty.IS_MUTED.set(isMutedCheckbox.isSelected());
 	}
 }

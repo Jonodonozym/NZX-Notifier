@@ -21,44 +21,30 @@ import java.util.Scanner;
 
 import jdz.NZXN.utils.StringEncryptor;
 import jdz.NZXN.utils.debugging.FileLogger;
+import lombok.Getter;
 
 public class PasswordVault {
-	private static final PasswordVault instance = new PasswordVault();
+	@Getter private static LoginDetails ANZDetails = LoginDetails.getEmpty();
+	@Getter private static boolean passwordRemembered = false;
 	
-	private String ANZUsername = "", ANZPassword = "";
-	private boolean rememberPasswords = false;
-	
-	private PasswordVault() {
+	static {
 		reload();
 	}
-	
-	public static PasswordVault getInstance() {
-		return instance;
-	}
-	
-	public void setANZDetails(String username, String password) {
-		ANZUsername = username;
-		ANZPassword = password;
-	}
 
-	public String getANZUsername() {
-		return ANZUsername;
+	public static void setANZDetails(String username, String password) {
+		ANZDetails = new LoginDetails(username,password);
 	}
 	
-	public String getANZPassword() {
-		return ANZPassword;
-	}
-	
-	public void save() {
+	public static void save() {
 		try {
 			File passFile = getPasswordFile();
 			passFile.delete();
 			passFile.createNewFile();
 			
 			StringWriter sw = new StringWriter();
-			sw.append("RememberPasswords == "+rememberPasswords+"\n");
-			if (rememberPasswords) {
-				sw.append("ANZ == "+ANZUsername+" || "+ANZPassword);
+			sw.append("RememberPasswords == "+passwordRemembered+"\n");
+			if (passwordRemembered) {
+				sw.append("ANZ == "+ANZDetails.getUsername()+" || "+ANZDetails.getPassword());
 			}
 			String encryptedData = StringEncryptor.encrypt(sw.toString());
 			sw.close();
@@ -72,7 +58,7 @@ public class PasswordVault {
 		}
 	}
 	
-	public void reload() {
+	public static void reload() {
 		File passFile = getPasswordFile();
 		if (passFile.exists()){
 			try {
@@ -82,11 +68,10 @@ public class PasswordVault {
 				
 				String[] lines = content.split("\n");
 
-				rememberPasswords = Boolean.parseBoolean(lines[0].replaceFirst("RememberPasswords == ", ""));
-				if (rememberPasswords) {
+				passwordRemembered = Boolean.parseBoolean(lines[0].replaceFirst("RememberPasswords == ", ""));
+				if (passwordRemembered) {
 					String[] ANZArgs = lines[1].split(" == ")[1].split(" || ");
-					ANZUsername = ANZArgs[0];
-					ANZPassword = ANZArgs[1];
+					ANZDetails = new LoginDetails(ANZArgs[0],  ANZArgs[1]);
 				}
 			}
 			catch(IOException | GeneralSecurityException e) {
@@ -95,9 +80,9 @@ public class PasswordVault {
 		}
 	}
 	
-	private File getPasswordFile() {
+	private static File getPasswordFile() {
 		try {
-			File configFile = Config.getInstance().getConfigFile();
+			File configFile = FileConfiguration.getDefaultConfigFile();
 			File passwordFolder = new File(configFile.getParentFile(),".temp");
 			
 			if (!passwordFolder.exists()) {

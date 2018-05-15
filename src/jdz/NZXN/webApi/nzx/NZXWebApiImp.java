@@ -17,27 +17,29 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import jdz.NZXN.config.Config;
+import jdz.NZXN.config.ConfigProperty;
 import jdz.NZXN.dataStructs.Announcement;
 import jdz.NZXN.dataStructs.Announcement.AnnouncementFlag;
 import jdz.NZXN.utils.debugging.FileLogger;
 import jdz.NZXN.webApi.Websites;
 
 public class NZXWebApiImp implements NZXWebApi{
-	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy, h:mm a", Locale.ENGLISH);
+	public static DateFormat formatter = new SimpleDateFormat("d MMM yyyy, h:mma");
 	
 	private static final String announcementsTable = "table.table-to-list.announcements-table";
+	private static final String instrumentSite = "https://www.nzx.com/instruments/";
 
 	@Override
 	@Deprecated // currently, jsoup cannot run javascript which loads the time
@@ -60,7 +62,7 @@ public class NZXWebApiImp implements NZXWebApi{
 	}
 
 	@Override
-	public List<Announcement> getMarketAnnouncements(Config config) {
+	public List<Announcement> getMarketAnnouncements() {
 
 		Document doc;
 		try {
@@ -73,12 +75,12 @@ public class NZXWebApiImp implements NZXWebApi{
 
 		List<Announcement> announcements = new ArrayList<Announcement>();
 
-		List<String> secWhitelist = config.getSecWhitelist();
-		List<String> typeWhitelist = config.getTypeWhitelist();
-		List<String> descWhitelist = config.getDescWhitelist();
-		List<String> secBlacklist = config.getSecBlacklist();
-		List<String> typeBlacklist = config.getTypeBlacklist();
-		List<String> descBlacklist = config.getDescBlacklist();
+		List<String> secWhitelist = ConfigProperty.SECURITY_WHITELIST.get();
+		List<String> typeWhitelist = ConfigProperty.TYPE_WHITELIST.get();
+		List<String> descWhitelist = ConfigProperty.DESCRIPTION_WHITELIST.get();
+		List<String> secBlacklist = ConfigProperty.SECURITY_BLACKLIST.get();
+		List<String> typeBlacklist = ConfigProperty.TYPE_BLACKLIST.get();
+		List<String> descBlacklist = ConfigProperty.DESCRIPTION_BLACKLIST.get();
 
 		for (Element row : table.select("tbody").select("tr")) {
 			Elements cells = row.select("td");
@@ -89,12 +91,14 @@ public class NZXWebApiImp implements NZXWebApi{
 			// gets the announcement time
 			// stops processing if the time has already been checked
 			String dateText = cells.select("td[data-title=Date]").select("span").first().ownText();
-			if (config.getLastCheck() != null) {
-				LocalDateTime date = LocalDateTime.parse(dateText.replaceAll("pm", "PM").replaceAll("am", "AM"),
-						formatter);
-				if (date.isBefore(config.getLastCheck()))
+			try {
+				long time = formatter.parse(dateText.replaceAll("pm", "PM").replaceAll("am", "AM")).getTime();
+				if (time < ConfigProperty.LAST_CHECK.get())
 					break;
+			} catch (ParseException e) {
+				FileLogger.createErrorLog(e);
 			}
+
 
 			// Get the company
 			// Ensures that the url is a company
@@ -191,5 +195,17 @@ public class NZXWebApiImp implements NZXWebApi{
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public boolean isValidSecutiry(String securityCode) {
+		Document doc;
+		try {
+			doc = Jsoup.connect(instrumentSite+securityCode).get();
+		} catch (IOException e) {
+			return false;
+		}
+
+		return doc.select("div[class=small-12.medium-9.columns.content]").isEmpty();
 	}
 }

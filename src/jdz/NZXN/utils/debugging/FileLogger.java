@@ -141,7 +141,7 @@ public final class FileLogger {
 				defaultErrorLogMessage,
 				error, file);
 	}
-
+	
 	static {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -175,7 +175,7 @@ public final class FileLogger {
 			file.mkdirs();
 	}
 
-	private static String getTimestamp() {
+	public static String getTimestamp() {
 		return new SimpleDateFormat("yyyy-MM-dd  HH-mm-ss").format(new Date());
 	}
 

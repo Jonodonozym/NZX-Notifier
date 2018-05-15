@@ -30,7 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import jdz.NZXN.config.Config;
+import jdz.NZXN.config.ConfigProperty;
 
 public class PriceConfigPane extends JPanel{
 	private static final long serialVersionUID = -5428649224901878255L;
@@ -38,7 +38,7 @@ public class PriceConfigPane extends JPanel{
 	private JCheckBox enablePrice;
 	private int border = 12;
 	
-	PriceConfigPane(ConfigWindow configWindow, Config config){
+	PriceConfigPane(ConfigWindow configWindow){
 		setLayout(new BorderLayout());
 		setBorder(BorderFactory.createEmptyBorder(4, 8, 8, 8));
 		
@@ -55,7 +55,7 @@ public class PriceConfigPane extends JPanel{
 	    
 		enablePrice = new JCheckBox("Enable price alerts");
 		enablePrice.setBackground(Color.WHITE);
-		enablePrice.setSelected(config.getPriceEnabled());
+		enablePrice.setSelected(ConfigProperty.PRICE_ALERTS_ENABLED.get());
 		JLabel priceAlertDisclosure = new JLabel("Prices are from the nzx website and are delayed 15-20 minutes");
 		priceAlertDisclosure.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 0));
 		
@@ -75,16 +75,16 @@ public class PriceConfigPane extends JPanel{
 		priceListPanel.setBorder(BorderFactory.createEmptyBorder(border, border, border, border));
 		priceListPanel.setLayout(new BoxLayout(priceListPanel, BoxLayout.Y_AXIS));
 		
-		reloadConfig(config);
+		reloadConfig();
 		
 		add(headerConfig, BorderLayout.PAGE_START);
 		add(scrollPane, BorderLayout.CENTER);
 	}
 	
-	void reloadConfig(Config config){
+	void reloadConfig(){
 		priceListPanel.removeAll();
 		
-		for (String s: config.getPriceAlerts())
+		for (String s: ConfigProperty.PRICE_ALERTS.get())
 			priceListPanel.add(PricePanel.fromString(this, s));
 		
 		JButton addButton = new JButton("+");
@@ -101,13 +101,13 @@ public class PriceConfigPane extends JPanel{
 		priceListPanel.add(addButton);
 	}
 	
-	void saveConfig(Config config){
+	void saveConfig(){
 		List<String> priceAlerts = new ArrayList<String>();
 		for (Component p: priceListPanel.getComponents())
 			if (p instanceof PricePanel)
 				priceAlerts.add(((PricePanel)p).toString());
-		config.setPriceAlerts(priceAlerts);
-		config.setPriceEnabled(enablePrice.isSelected());
+		ConfigProperty.PRICE_ALERTS.set(priceAlerts);
+		ConfigProperty.PRICE_ALERTS_ENABLED.set(enablePrice.isSelected());
 	}
 
 	void removePanel(PricePanel panel){

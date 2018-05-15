@@ -13,9 +13,9 @@ import javax.swing.SwingUtilities;
 import jdz.NZXN.res.Resources;
 
 @SuppressWarnings("serial")
-public class SplashFrame extends JFrame{
+public class JSplashFrame extends JFrame{
 	
-	public SplashFrame(){
+	public JSplashFrame(){
 		setVisible(false);
 		setUndecorated(true);
 		setBackground(Color.WHITE);

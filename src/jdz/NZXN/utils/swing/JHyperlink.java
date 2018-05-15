@@ -25,7 +25,8 @@ public class JHyperlink extends JLabel{
 		 super(label);
 		 setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		 addMouseListener(new MouseAdapter() {
-		   public void mouseClicked(MouseEvent e) {
+		   @Override
+		public void mouseClicked(MouseEvent e) {
 		      if (e.getClickCount() > 0) {
 		          if (Desktop.isDesktopSupported()) {
 		                Desktop desktop = Desktop.getDesktop();
