@@ -15,37 +15,38 @@ public class TradeTableHistory {
 	@Getter private final LocalDate date;
 	private List<TradeTable> pastTables = new ArrayList<TradeTable>();
 	private List<TradeOffer> pastTrades = new ArrayList<TradeOffer>();
-	
+
 	public TradeTableHistory(String securityCode) {
 		this(securityCode, LocalDate.now());
 	}
-	
+
 	public TradeTableHistory(String securityCode, LocalDate date) {
 		this.securityCode = securityCode;
 		this.date = date;
 	}
-	
+
 	public void add(TradeTable table) {
 		if (table.getSecurityCode().equalsIgnoreCase(securityCode)) {
-			LocalTime lastTrade = pastTrades.get(pastTrades.size()-1).getTime();
-			
-			for (TradeOffer offer: table.getTrades())
+			LocalTime lastTrade = pastTrades.get(pastTrades.size() - 1).getTime();
+
+			for (TradeOffer offer : table.getTrades())
 				if (offer.getTime().isAfter(lastTrade))
 					pastTrades.add(offer);
 				else
 					break;
-			
+
 			pastTables.add(table);
 		}
 		else
-			FileLogger.createErrorLog(new IllegalArgumentException("TradeTable code "+table.getSecurityCode()+" Doesn't equal history code "+securityCode));
+			FileLogger.createErrorLog(new IllegalArgumentException(
+					"TradeTable code " + table.getSecurityCode() + " Doesn't equal history code " + securityCode));
 	}
-	
-	public List<TradeTable> getTables(){
+
+	public List<TradeTable> getTables() {
 		return Collections.unmodifiableList(pastTables);
 	}
-	
-	public List<TradeOffer> getTrades(){
+
+	public List<TradeOffer> getTrades() {
 		return Collections.unmodifiableList(pastTrades);
 	}
 }

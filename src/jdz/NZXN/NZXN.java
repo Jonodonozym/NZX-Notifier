@@ -9,7 +9,6 @@
 
 package jdz.NZXN;
 
-import java.awt.Color;
 import java.awt.Frame;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -22,32 +21,29 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.plaf.ColorUIResource;
 
+import com.google.common.eventbus.EventBus;
+
+import jdz.NZXN.checker.AnnouncementChecker;
 import jdz.NZXN.gui.ConfigWindow;
-import jdz.NZXN.tasks.CheckAnnouncementsTask;
+import jdz.NZXN.gui.UIManager;
+import jdz.NZXN.io.AnnouncementIO;
+import jdz.NZXN.notification.NotificationListener;
 import jdz.NZXN.utils.swing.JSplashFrame;
+import lombok.Getter;
 
-public class Main {
+public class NZXN {
+	@Getter private static final EventBus eventBus = new EventBus();
+
+	static {
+		UIManager.useCleanStyle();
+
+		eventBus.register(new AnnouncementIO());
+		eventBus.register(new NotificationListener());
+	}
+
 	public static void main(String[] args) {
 		List<String> argsList = Arrays.asList(args);
-
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			UIManager.put("Panel.background", Color.WHITE);
-			UIManager.put("OptionPane.background", Color.WHITE);
-
-			UIManager.put("Button.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
-			UIManager.put("CheckBox.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
-			UIManager.put("TabbedPane.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
-			UIManager.put("ComboBox.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
-		}
-		catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}
 
 		if (!setAppLock()) {
 			JOptionPane.showMessageDialog(new JFrame(), "Error: NXZ Notifier already running", "Error",
@@ -59,9 +55,9 @@ public class Main {
 		if (!argsList.contains("S"))
 			splashFrame = new JSplashFrame();
 
-		CheckAnnouncementsTask.getInstance().start();
+		AnnouncementChecker.getInstance().start();
 		ConfigWindow window = new ConfigWindow(false);
-		CheckAnnouncementsTask.getInstance().check();
+		AnnouncementChecker.getInstance().check();
 		if (argsList.contains("S"))
 			window.sendToTray(new WindowEvent(window, WindowEvent.WINDOW_ICONIFIED, 0, Frame.ICONIFIED), false);
 		else {

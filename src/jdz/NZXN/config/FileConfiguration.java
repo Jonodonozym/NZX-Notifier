@@ -24,7 +24,8 @@ import jdz.NZXN.utils.ExportFile;
 import jdz.NZXN.utils.debugging.FileLogger;
 
 /**
- * Configuration class that acts as an interface for saving, loading, reading and
+ * Configuration class that acts as an interface for saving, loading, reading
+ * and
  * writing the config across program sessions
  *
  * @author Jaiden Baker
@@ -32,8 +33,9 @@ import jdz.NZXN.utils.debugging.FileLogger;
 public class FileConfiguration {
 	private static final Map<ConfigProperty<?>, Object> properties = new HashMap<ConfigProperty<?>, Object>();
 	private static final File file = getDefaultConfigFile();
-	
+
 	static {
+		reloadDefaults();
 		reload();
 	}
 
@@ -64,12 +66,15 @@ public class FileConfiguration {
 			file.delete();
 			file.createNewFile();
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("# Config for NZX notifier \n");
-			bw.write("# " + FileLogger.getTimestamp() + " \n");
-			
-			for (ConfigProperty p : ConfigProperty.getAll())
-				bw.write(p.getName()+" = "+p.toString(properties.get(p)));
-			
+			bw.write("# Config for NZX notifier");
+			bw.newLine();
+			bw.write("# " + FileLogger.getTimestamp());
+			bw.newLine();
+
+			for (ConfigProperty p : ConfigProperty.getAll()) {
+				bw.write(p.getName() + " = " + p.toString(properties.get(p)));
+				bw.newLine();
+			}
 			bw.flush();
 			bw.close();
 		}
@@ -87,13 +92,15 @@ public class FileConfiguration {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line = br.readLine();
 			while (line != null && !line.equals("")) {
-				if (line.startsWith("#"))
+				if (line.startsWith("#")) {
+					line = br.readLine();
 					continue;
+				}
 
 				int equalsIndex = line.indexOf("=");
 				int commentIndex = line.indexOf("#");
 
-				String name = line.substring(0, equalsIndex);
+				String name = line.substring(0, equalsIndex).trim();
 				String value = commentIndex == -1 ? line.substring(equalsIndex + 1)
 						: line.substring(equalsIndex + 1, commentIndex);
 				value = value.trim();

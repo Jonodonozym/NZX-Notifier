@@ -11,12 +11,12 @@ public class StringUtils {
 			return "";
 		StringBuilder sb = new StringBuilder(list.size() * 32);
 		for (String string : list)
-			sb.append(string+separator);
-		return sb.substring(0, sb.length()-separator.length()).toString();
+			sb.append(string + separator);
+		return sb.substring(0, sb.length() - separator.length()).toString();
 	}
-	
+
 	public static List<String> parseList(String s, String separator) {
-		if (s.equals(""))
+		if (s.trim().equals(""))
 			return new ArrayList<String>();
 		List<String> retList = new ArrayList<String>(Arrays.asList(s.split(separator)));
 		for (String str : retList)

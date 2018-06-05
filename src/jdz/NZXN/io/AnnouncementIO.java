@@ -5,14 +5,19 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.List;
 
+import com.google.common.eventbus.Subscribe;
+
+import jdz.NZXN.checker.AnnouncementEvent;
+import jdz.NZXN.config.ConfigProperty;
 import jdz.NZXN.dataStructs.Announcement;
-import jdz.NZXN.webApi.nzx.NZXWebApiImp;
 
 public class AnnouncementIO {
+	@Subscribe public void onAnnouncement(AnnouncementEvent event) {
+		addToCSV(event.getAnnouncements());
+	}
+	
 	public static void addToCSV(List<Announcement> announcements) {
 		try {
 			File csv = getCSVFile();
@@ -20,35 +25,36 @@ public class AnnouncementIO {
 				return;
 			BufferedWriter bw = new BufferedWriter(new FileWriter(csv, true));
 			for (Announcement a : announcements) {
-				bw.write(a.getCompany() + "," + "\"=HYPERLINK(\"\"" + a.getUrl() + "\"\",\"\"" + a.getNotification().replace(")", "").replace("(", "") + "\"\")\"" + ","
-						+ a.getType() + "," + a.getTime()+","+a.getFlag());
+				bw.write(a.getCompany() + "," + "\"=HYPERLINK(\"\"" + a.getUrl() + "\"\",\"\""
+						+ a.getNotification().replace(")", "").replace("(", "") + "\"\")\"" + "," + a.getType() + ","
+						+ a.getTime() + "," + a.getFlag());
 				bw.newLine();
 			}
 			bw.flush();
 			bw.close();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static File getCSVFile() {
 		try {
-			String dirPath = Paths.get(NZXWebApiImp.class.getProtectionDomain().getCodeSource().getLocation().toURI())
-					.toFile() + File.separator + "Past Announcements";
-			String pastAnnPath = dirPath + File.separator + "Past Announcements.csv";
+			File AnnouncementFolder = ConfigProperty.ANNOUNCEMENT_SAVING_FOLDER.get();
+			if (!AnnouncementFolder.exists())
+				AnnouncementFolder.mkdirs();
 
-			new File(dirPath).mkdirs();
-
-			File pastAnn = new File(pastAnnPath);
-			if (!pastAnn.exists()) {
-				pastAnn.createNewFile();
-				BufferedWriter bw = new BufferedWriter(new FileWriter(pastAnn, true));
+			File CSVFile = new File(AnnouncementFolder, "Past Announcements.csv");
+			if (!CSVFile.exists()) {
+				CSVFile.createNewFile();
+				BufferedWriter bw = new BufferedWriter(new FileWriter(CSVFile, true));
 				bw.write("Security,Notification,Type,Date,Time,Flag");
 				bw.newLine();
 				bw.close();
 			}
-			return pastAnn;
-		} catch (IOException | URISyntaxException e) {
+			return CSVFile;
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;

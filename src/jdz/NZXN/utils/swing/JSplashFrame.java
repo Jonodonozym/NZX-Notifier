@@ -10,12 +10,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import jdz.NZXN.res.Resources;
+import jdz.NZXN.resources.Resources;
 
 @SuppressWarnings("serial")
-public class JSplashFrame extends JFrame{
-	
-	public JSplashFrame(){
+public class JSplashFrame extends JFrame {
+
+	public JSplashFrame() {
 		setVisible(false);
 		setUndecorated(true);
 		setBackground(Color.WHITE);
@@ -26,16 +26,17 @@ public class JSplashFrame extends JFrame{
 				g.drawImage(Resources.bannerImage, 0, 0, null);
 			}
 		};
-		bannerImage.setPreferredSize(new Dimension(Resources.bannerImage.getWidth(), Resources.bannerImage.getHeight()));
+		bannerImage
+				.setPreferredSize(new Dimension(Resources.bannerImage.getWidth(), Resources.bannerImage.getHeight()));
 		add(bannerImage);
-        setIconImage(Resources.appIcon);
+		setIconImage(Resources.appIcon);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				pack();
 				Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-				setLocation(dim.width/2-getWidth()/2, dim.height/2-getHeight()/2);
+				setLocation(dim.width / 2 - getWidth() / 2, dim.height / 2 - getHeight() / 2);
 				setAlwaysOnTop(true);
 				setVisible(true);
 			}

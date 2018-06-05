@@ -34,9 +34,9 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import jdz.NZXN.checker.AnnouncementChecker;
 import jdz.NZXN.config.ConfigChangeListener;
 import jdz.NZXN.config.ConfigProperty;
-import jdz.NZXN.tasks.CheckAnnouncementsTask;
 import jdz.NZXN.webApi.nzx.NZXWebApi;
 
 @SuppressWarnings("serial")
@@ -79,11 +79,11 @@ public class MainConfigPane extends JPanel {
 	private JLabel[] getTimeLabels() {
 		JLabel lastCheck = new JLabel(
 				"<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>"
-						+ timeFormat.format(CheckAnnouncementsTask.getInstance().getLastCheck()) + "</font>");
+						+ timeFormat.format(AnnouncementChecker.getInstance().getLastCheck()) + "</font>");
 		JLabel currentTime = new JLabel("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>"
-				+ timeFormat.format(CheckAnnouncementsTask.getInstance().getCurrentTime()) + "</font>");
+				+ timeFormat.format(AnnouncementChecker.getInstance().getCurrentTime()) + "</font>");
 		nextCheck = new JLabel("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>"
-				+ timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck()) + "</font>");
+				+ timeFormat.format(AnnouncementChecker.getInstance().getNextCheck()) + "</font>");
 
 
 		lastCheck.setAlignmentX(LEFT_ALIGNMENT);
@@ -92,22 +92,22 @@ public class MainConfigPane extends JPanel {
 
 		nextCheck.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
 
-		CheckAnnouncementsTask.getInstance().addTaskAfterCheck(new Runnable() {
+		AnnouncementChecker.getInstance().addTaskAfterCheck(new Runnable() {
 			@Override
 			public void run() {
 				lastCheck
 						.setText("<html>Last Check:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#00C1D8>"
-								+ timeFormat.format(CheckAnnouncementsTask.getInstance().getLastCheck()) + "</font>");
+								+ timeFormat.format(AnnouncementChecker.getInstance().getLastCheck()) + "</font>");
 				nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>"
-						+ timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck()) + "</font>");
+						+ timeFormat.format(AnnouncementChecker.getInstance().getNextCheck()) + "</font>");
 			}
 		});
 
-		CheckAnnouncementsTask.getInstance().addTaskEachSecond(new Runnable() {
+		AnnouncementChecker.getInstance().addTaskEachSecond(new Runnable() {
 			@Override
 			public void run() {
 				currentTime.setText("<html>Current Time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#DE2700>"
-						+ timeFormat.format(CheckAnnouncementsTask.getInstance().getCurrentTime()) + "</font>");
+						+ timeFormat.format(AnnouncementChecker.getInstance().getCurrentTime()) + "</font>");
 			}
 		});
 
@@ -117,17 +117,17 @@ public class MainConfigPane extends JPanel {
 	private JPanel getCheckNowPanel() {
 		JPanel checkNowPanel = new JPanel();
 		JLabel checkResults = new JLabel("");
-		if (!NZXWebApi.instance.canConnect())
+		if (!NZXWebApi.getInstance().canConnect())
 			checkResults.setText("<html><font color=#DE2700>Error: no connection to the NZX website</font>");
 		checkNowPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		JButton checkNow = new JButton("Check Now");
 		checkNow.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (NZXWebApi.instance.canConnect()) {
+				if (NZXWebApi.getInstance().canConnect()) {
 					checkResults.setText("Checking now...");
 					repaint();
-					CheckAnnouncementsTask.getInstance().check();
+					AnnouncementChecker.getInstance().check();
 					checkResults.setText("Check completed");
 					new Timer().schedule(new TimerTask() {
 						@Override
@@ -162,7 +162,7 @@ public class MainConfigPane extends JPanel {
 		spinner.addChangeListener((e) -> {
 			ConfigProperty.CHECK_INTERVAL_MINUTES.set(spinnerModel.getNumber().intValue());
 			nextCheck.setText("<html>Next Check At:&nbsp;&nbsp;<font color=#DE2700>"
-					+ timeFormat.format(CheckAnnouncementsTask.getInstance().getNextCheck()) + "</font>");
+					+ timeFormat.format(AnnouncementChecker.getInstance().getNextCheck()) + "</font>");
 		});
 		ConfigChangeListener.register(ConfigProperty.CHECK_INTERVAL_MINUTES, (newValue) -> {
 			spinnerModel.setValue(newValue);

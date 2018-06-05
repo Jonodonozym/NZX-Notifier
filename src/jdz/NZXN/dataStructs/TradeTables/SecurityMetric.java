@@ -37,7 +37,7 @@ public enum SecurityMetric {
 
 		return totalWeightedVolume / table.getOverview().getValue();
 	}
-	
+
 	private double getTradedVolume(TradeTable table) {
 		return 0;
 	}

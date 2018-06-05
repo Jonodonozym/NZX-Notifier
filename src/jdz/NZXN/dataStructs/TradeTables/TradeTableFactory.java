@@ -21,28 +21,28 @@ public class TradeTableFactory {
 
 	static String toString(TradeTableHistory history) {
 		StringWriter sw = new StringWriter();
-		sw.append(history.getSecurityCode()+'\n');
-		sw.append(history.getDate().toString()+'\n');
-		for (TradeTable table: history.getTables()){
-			sw.append("TABLE"+'\n');
+		sw.append(history.getSecurityCode() + '\n');
+		sw.append(history.getDate().toString() + '\n');
+		for (TradeTable table : history.getTables()) {
+			sw.append("TABLE" + '\n');
 			sw.append(toString(table));
 		}
 		sw.append("ENDOFHISTORY");
 		return sw.toString();
 	}
-	
+
 	static TradeTableHistory parseHistory(Scanner s) {
 		String securityCode = s.nextLine();
 		LocalDate date = LocalDate.parse(s.nextLine(), df);
-		
+
 		TradeTableHistory history = new TradeTableHistory(securityCode, date);
-		
-		while(s.nextLine().equals("TABLE"))
+
+		while (s.nextLine().equals("TABLE"))
 			history.add(parseTable(s));
-		
+
 		return history;
 	}
-	
+
 	static String toString(TradeTable table) {
 		StringWriter sw = new StringWriter();
 		sw.append(table.getSecurityCode() + '\n');
@@ -52,15 +52,15 @@ public class TradeTableFactory {
 
 		sw.append("BIDS" + '\n');
 		for (TradeOffer offer : table.getBids())
-			sw.append('\t'+tradeOfferToString(offer) + '\n');
+			sw.append('\t' + tradeOfferToString(offer) + '\n');
 
 		sw.append("ASKS" + '\n');
 		for (TradeOffer offer : table.getAsks())
-			sw.append('\t'+tradeOfferToString(offer) + '\n');
+			sw.append('\t' + tradeOfferToString(offer) + '\n');
 
 		sw.append("TRADES" + '\n');
 		for (TradeOffer offer : table.getTrades())
-			sw.append('\t'+tradeOfferToString(offer) + '\n');
+			sw.append('\t' + tradeOfferToString(offer) + '\n');
 
 		sw.append("TABLEEND");
 
@@ -112,7 +112,8 @@ public class TradeTableFactory {
 			double value = Double.parseDouble(args[5]);
 			LocalDateTime time = LocalDateTime.parse(args[6]);
 			return new TradeOverview(price, vwap, buy, sell, volume, value, time);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			FileLogger.createErrorLog(e);
 			return null;
 		}
@@ -131,7 +132,8 @@ public class TradeTableFactory {
 			TradeOfferType type = TradeOfferType.valueOf(args[4]);
 			LocalTime time = LocalTime.parse(args[3], dtf);
 			return new TradeOffer(price, volume, time, args[4], type);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			FileLogger.createErrorLog(e);
 			return null;
 		}

@@ -20,25 +20,26 @@ import java.net.URISyntaxException;
 import javax.swing.JLabel;
 
 @SuppressWarnings("serial")
-public class JHyperlink extends JLabel{
-	public JHyperlink(String label, String url){
-		 super(label);
-		 setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		 addMouseListener(new MouseAdapter() {
-		   @Override
-		public void mouseClicked(MouseEvent e) {
-		      if (e.getClickCount() > 0) {
-		          if (Desktop.isDesktopSupported()) {
-		                Desktop desktop = Desktop.getDesktop();
-		                try {
-		                    URI uri = new URI(url);
-		                    desktop.browse(uri);
-		                } catch (IOException | URISyntaxException ex) {
-		                    ex.printStackTrace();
-		                }
-		        }
-		      }
-		   }
+public class JHyperlink extends JLabel {
+	public JHyperlink(String label, String url) {
+		super(label);
+		setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() > 0) {
+					if (Desktop.isDesktopSupported()) {
+						Desktop desktop = Desktop.getDesktop();
+						try {
+							URI uri = new URI(url);
+							desktop.browse(uri);
+						}
+						catch (IOException | URISyntaxException ex) {
+							ex.printStackTrace();
+						}
+					}
+				}
+			}
 		});
 	}
 }

@@ -6,12 +6,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Taken from https://kyryloholodnov.wordpress.com/2013/07/07/how-to-calculate-object-size-in-java/
- * Christ, though, ploughed through the web for hours just to find this gem that runs without a fuckton of 
+ * Taken from
+ * https://kyryloholodnov.wordpress.com/2013/07/07/how-to-calculate-object-size-in-java/
+ * Christ, though, ploughed through the web for hours just to find this gem that
+ * runs without a fuckton of
  * dependancies or jvm arguments or other wizzardry.
+ * 
  * @author Kyrylo Holodnov
  */
-public class ObjectSizeFetcher {	
+public class ObjectSizeFetcher {
 	private static final int REFERENCE_SIZE;
 	private static final int HEADER_SIZE;
 	private static final int LONG_SIZE = 8;
@@ -30,11 +33,13 @@ public class ObjectSizeFetcher {
 				// java.vm.name is something like "Java HotSpot(TM) 64-Bit Server VM"
 				REFERENCE_SIZE = 8;
 				HEADER_SIZE = 16;
-			} else {
+			}
+			else {
 				REFERENCE_SIZE = 4;
 				HEADER_SIZE = 8;
 			}
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			ex.printStackTrace();
 			throw new AssertionError(ex);
 		}
@@ -50,7 +55,7 @@ public class ObjectSizeFetcher {
 		}
 	}
 
-	private static long sizeOf(Object o, Set<ObjectWrapper> visited) throws IllegalAccessException{
+	private static long sizeOf(Object o, Set<ObjectWrapper> visited) throws IllegalAccessException {
 		if (o == null) {
 			return 0;
 		}
@@ -66,35 +71,44 @@ public class ObjectSizeFetcher {
 			if (clazz == long[].class) {
 				long[] objs = (long[]) o;
 				size += objs.length * LONG_SIZE;
-			} else if (clazz == int[].class) {
+			}
+			else if (clazz == int[].class) {
 				int[] objs = (int[]) o;
 				size += objs.length * INT_SIZE;
-			} else if (clazz == byte[].class) {
+			}
+			else if (clazz == byte[].class) {
 				byte[] objs = (byte[]) o;
 				size += objs.length * BYTE_SIZE;
-			} else if (clazz == boolean[].class) {
+			}
+			else if (clazz == boolean[].class) {
 				boolean[] objs = (boolean[]) o;
 				size += objs.length * BOOLEAN_SIZE;
-			} else if (clazz == char[].class) {
+			}
+			else if (clazz == char[].class) {
 				char[] objs = (char[]) o;
 				size += objs.length * CHAR_SIZE;
-			} else if (clazz == short[].class) {
+			}
+			else if (clazz == short[].class) {
 				short[] objs = (short[]) o;
 				size += objs.length * SHORT_SIZE;
-			} else if (clazz == float[].class) {
+			}
+			else if (clazz == float[].class) {
 				float[] objs = (float[]) o;
 				size += objs.length * FLOAT_SIZE;
-			} else if (clazz == double[].class) {
+			}
+			else if (clazz == double[].class) {
 				double[] objs = (double[]) o;
 				size += objs.length * DOUBLE_SIZE;
-			} else {
+			}
+			else {
 				Object[] objs = (Object[]) o;
 				for (int i = 0; i < objs.length; i++) {
 					size += sizeOf(objs[i], visited) + REFERENCE_SIZE;
 				}
 			}
 			size += INT_SIZE;
-		} else {
+		}
+		else {
 			Field[] fields = o.getClass().getDeclaredFields();
 			for (int i = 0; i < fields.length; i++) {
 				if (Modifier.isStatic(fields[i].getModifiers())) {
@@ -104,21 +118,29 @@ public class ObjectSizeFetcher {
 				String fieldType = fields[i].getGenericType().toString();
 				if (fieldType.equals("long")) {
 					size += LONG_SIZE;
-				} else if (fieldType.equals("int")) {
+				}
+				else if (fieldType.equals("int")) {
 					size += INT_SIZE;
-				} else if (fieldType.equals("byte")) {
+				}
+				else if (fieldType.equals("byte")) {
 					size += BYTE_SIZE;
-				} else if (fieldType.equals("boolean")) {
+				}
+				else if (fieldType.equals("boolean")) {
 					size += BOOLEAN_SIZE;
-				} else if (fieldType.equals("char")) {
+				}
+				else if (fieldType.equals("char")) {
 					size += CHAR_SIZE;
-				} else if (fieldType.equals("short")) {
+				}
+				else if (fieldType.equals("short")) {
 					size += SHORT_SIZE;
-				} else if (fieldType.equals("float")) {
+				}
+				else if (fieldType.equals("float")) {
 					size += FLOAT_SIZE;
-				} else if (fieldType.equals("double")) {
+				}
+				else if (fieldType.equals("double")) {
 					size += DOUBLE_SIZE;
-				} else {
+				}
+				else {
 					size += sizeOf(fields[i].get(o), visited) + REFERENCE_SIZE;
 				}
 			}

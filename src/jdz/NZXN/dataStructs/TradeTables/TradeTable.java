@@ -26,86 +26,90 @@ import javax.swing.SwingConstants;
 import lombok.Getter;
 
 
-public class TradeTable{
+public class TradeTable {
 	@Getter private final String securityCode;
 	@Getter private final TradeOverview overview;
 	private final List<TradeOffer> bids;
 	private final List<TradeOffer> asks;
 	private final List<TradeOffer> pastTrades;
 	@Getter private final LocalDateTime creationTime;
-	
-	private final Map<SecurityMetric, Double> metrics = new HashMap<SecurityMetric, Double>(SecurityMetric.values().length);
-	
-	TradeTable(String securityCode, TradeOverview overview, List<TradeOffer> bids, List<TradeOffer> asks, List<TradeOffer> pastTrades, LocalDateTime creationTime) {
+
+	private final Map<SecurityMetric, Double> metrics = new HashMap<SecurityMetric, Double>(
+			SecurityMetric.values().length);
+
+	TradeTable(String securityCode, TradeOverview overview, List<TradeOffer> bids, List<TradeOffer> asks,
+			List<TradeOffer> pastTrades, LocalDateTime creationTime) {
 		this.securityCode = securityCode;
 		this.overview = overview;
 		this.bids = bids;
 		this.asks = asks;
 		this.pastTrades = pastTrades;
 		this.creationTime = creationTime;
-		
-		for (SecurityMetric metric: SecurityMetric.values())
+
+		for (SecurityMetric metric : SecurityMetric.values())
 			metrics.put(metric, metric.calculate(this));
 	}
 
-	TradeTable(String securityCode, TradeOverview overview, List<TradeOffer> bids, List<TradeOffer> asks, List<TradeOffer> pastTrades) {
+	TradeTable(String securityCode, TradeOverview overview, List<TradeOffer> bids, List<TradeOffer> asks,
+			List<TradeOffer> pastTrades) {
 		this(securityCode, overview, bids, asks, pastTrades, LocalDateTime.now());
 	}
-	
+
 	public double getMetric(SecurityMetric metric) {
 		return metrics.get(metric);
 	}
-	
+
 	public List<TradeOffer> getTrades() {
 		return Collections.unmodifiableList(pastTrades);
 	}
-	
-	public List<TradeOffer> getAsks(){
+
+	public List<TradeOffer> getAsks() {
 		return Collections.unmodifiableList(asks);
 	}
-	
-	public List<TradeOffer> getBids(){
+
+	public List<TradeOffer> getBids() {
 		return Collections.unmodifiableList(bids);
 	}
 
-	public JPanel toJPanel(){
+	public JPanel toJPanel() {
 		return toJPanel(Integer.MAX_VALUE);
 	}
-	
-	public JPanel toJPanel(int maxRows){
+
+	public JPanel toJPanel(int maxRows) {
 		// TODO include TradeOverview
 		JPanel table = new JPanel();
 		table.setLayout(new GridLayout(1, 3));
-		
-		String[] titles = new String[]{ "Bid", "Ask" , "Past Trades"};
-		String[] subColumnNames = new String[] {"Price", "Volume"};
-		
+
+		String[] titles = new String[] { "Bid", "Ask", "Past Trades" };
+		String[] subColumnNames = new String[] { "Price", "Volume" };
+
 		List<List<TradeOffer>> tradeColumns = Arrays.asList(bids, asks, pastTrades);
-		
+
 		// for each trade type in bid ask and pastTrades
-		for (int i=0; i<tradeColumns.size(); i++){
+		for (int i = 0; i < tradeColumns.size(); i++) {
 			JPanel column = new JPanel();
 			column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
 			column.add(new JLabel(titles[i]));
-			
+
 			// create cub-columns for price and volume
 			JPanel[] subColumns = new JPanel[2];
-			for (int j=0; j<subColumns.length; j++){
+			for (int j = 0; j < subColumns.length; j++) {
 				subColumns[j].setLayout(new BoxLayout(subColumns[j], BoxLayout.Y_AXIS));
 				subColumns[j].add(new JLabel(subColumnNames[j]));
 				subColumns[j].add(new JSeparator(SwingConstants.HORIZONTAL));
 			}
-			
-			for (int j=0; j<maxRows; j++){
-				if (tradeColumns.get(i).size() <= j) break;
+
+			for (int j = 0; j < maxRows; j++) {
+				if (tradeColumns.get(i).size() <= j)
+					break;
 				TradeOffer offer = tradeColumns.get(i).get(j);
-				subColumns[0].add(new JLabel(""+offer.getPrice()));
-				subColumns[1].add(new JLabel(""+offer.getVolume()));
+				subColumns[0].add(new JLabel("" + offer.getPrice()));
+				subColumns[1].add(new JLabel("" + offer.getVolume()));
 			}
-			
+
 			table.add(column);
 		}
-		
+
 		return table;
 	}
 }

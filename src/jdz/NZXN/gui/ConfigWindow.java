@@ -23,14 +23,15 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
+import jdz.NZXN.checker.AnnouncementChecker;
 import jdz.NZXN.config.ConfigChangeListener;
 import jdz.NZXN.config.ConfigProperty;
-import jdz.NZXN.res.Resources;
-import jdz.NZXN.tasks.CheckAnnouncementsTask;
+import jdz.NZXN.resources.Resources;
 import jdz.NZXN.utils.swing.JSysTrayFrame;
 
 /**
- * A Window that allows the user to change the configuration for the NZX Notifier program
+ * A Window that allows the user to change the configuration for the NZX
+ * Notifier program
  * offloads pretty much everything to the Panes
  *
  * @author Jaiden Baker
@@ -46,25 +47,28 @@ public class ConfigWindow extends JSysTrayFrame {
 	/**
 	 * Creates and displays a config window
 	 */
-	public ConfigWindow(){ this(true); }
-	
+	public ConfigWindow() {
+		this(true);
+	}
+
 	/**
 	 * Creates a config window, optionally displaying it
+	 * 
 	 * @param isVisible whether or not the window starts off as visible
 	 */
 	public ConfigWindow(boolean isVisible) {
 		super("NZX Notifier",
 				"The NZX Notifier is still running. " + "Double click this icon to re-open the config window.",
 				new JPanel(), Resources.appIcon);
-        
-        MenuItem configureItem = new MenuItem("Configure");
-        configureItem.addActionListener((a)->{
-                setVisible(true);
-                setExtendedState(Frame.NORMAL);
-            });
-        addSysTrayMenuItem(configureItem);
-        
-		
+
+		MenuItem configureItem = new MenuItem("Configure");
+		configureItem.addActionListener((a) -> {
+			setVisible(true);
+			setExtendedState(Frame.NORMAL);
+		});
+		addSysTrayMenuItem(configureItem);
+
+
 		setVisible(false);
 		setBackground(Color.white);
 		setResizable(false);
@@ -75,10 +79,14 @@ public class ConfigWindow extends JSysTrayFrame {
 		announceConfig = new AnnounceConfigPane(this);
 		ANZLogin = new ANZLoginPanel(this);
 
-        CheckboxMenuItem muteItem = new CheckboxMenuItem("Mute", ConfigProperty.IS_MUTED.get());
-        muteItem.addItemListener((l)->{ConfigProperty.IS_MUTED.set(l.getStateChange() == ItemEvent.SELECTED);});
-        ConfigChangeListener.register(ConfigProperty.IS_MUTED, (newValue)->{muteItem.setState(newValue);});
-        addSysTrayMenuItem(muteItem);
+		CheckboxMenuItem muteItem = new CheckboxMenuItem("Mute", ConfigProperty.IS_MUTED.get());
+		muteItem.addItemListener((l) -> {
+			ConfigProperty.IS_MUTED.set(l.getStateChange() == ItemEvent.SELECTED);
+		});
+		ConfigChangeListener.register(ConfigProperty.IS_MUTED, (newValue) -> {
+			muteItem.setState(newValue);
+		});
+		addSysTrayMenuItem(muteItem);
 
 		// adding each panel to a tabbed frame
 		JTabbedPane tabbedPane = new JTabbedPane();
@@ -90,7 +98,7 @@ public class ConfigWindow extends JSysTrayFrame {
 		setContentPane(tabbedPane);
 
 		// auto-save the config before running a check
-		CheckAnnouncementsTask.getInstance().addTaskBeforeCheck(new Runnable() {
+		AnnouncementChecker.getInstance().addTaskBeforeCheck(new Runnable() {
 			@Override
 			public void run() {
 				saveConfig();
@@ -111,7 +119,7 @@ public class ConfigWindow extends JSysTrayFrame {
 			public void run() {
 				pack();
 				Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-				setLocation(dim.width/2-getWidth()/2, dim.height/2-getHeight()/2);
+				setLocation(dim.width / 2 - getWidth() / 2, dim.height / 2 - getHeight() / 2);
 				setVisible(isVisible);
 				toFront();
 			}
@@ -126,11 +134,11 @@ public class ConfigWindow extends JSysTrayFrame {
 		announceConfig.saveConfig();
 		priceConfig.saveConfig();
 	}
-	
+
 	/**
 	 * Loads the external config and update the window's contents to match
 	 */
-	public void reloadConfig(){
+	public void reloadConfig() {
 		mainConfig.reloadConfig();
 		announceConfig.reloadConfig();
 		priceConfig.reloadConfig();

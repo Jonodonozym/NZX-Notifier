@@ -20,27 +20,27 @@ public class TradeTableBuilder {
 		this.overview = overview;
 		this.securityCode = securityCode;
 	}
-	
+
 	public TradeTableBuilder withCreationTime(LocalDateTime time) {
 		creationTime = time;
 		return this;
 	}
-	
-	public TradeTableBuilder addBid(double price, double volume){
+
+	public TradeTableBuilder addBid(double price, double volume) {
 		bids.add(new TradeOffer(price, volume, TradeOfferType.BID));
 		return this;
 	}
-	
-	public TradeTableBuilder addAsk(double price, double volume){
+
+	public TradeTableBuilder addAsk(double price, double volume) {
 		asks.add(new TradeOffer(price, volume, TradeOfferType.ASK));
 		return this;
 	}
-	
-	public TradeTableBuilder addTrade(double price, double volume, LocalTime time, String cond){
+
+	public TradeTableBuilder addTrade(double price, double volume, LocalTime time, String cond) {
 		pastTrades.add(new TradeOffer(price, volume, time, cond));
 		return this;
 	}
-	
+
 	public TradeTable create() {
 		if (creationTime == null)
 			return new TradeTable(securityCode, overview, bids, asks, pastTrades);

@@ -19,8 +19,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import jdz.NZXN.config.PasswordVault;
+import jdz.NZXN.resources.Resources;
 import jdz.NZXN.config.LoginDetails;
-import jdz.NZXN.res.Resources;
 import jdz.NZXN.utils.swing.JImagePanel;
 import jdz.NZXN.webApi.anz.ANZLoginListener;
 import jdz.NZXN.webApi.anz.ANZWebApi;
@@ -43,7 +43,7 @@ public class ANZLoginPanel extends JPanel implements ANZLoginListener {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		JImagePanel image = new JImagePanel(Resources.ANZLogo);
-		LoginDetails anzDetails = PasswordVault.getANZDetails(); 
+		LoginDetails anzDetails = PasswordVault.getANZDetails();
 		if (!anzDetails.isEmpty()) {
 			username = new JTextField(anzDetails.getUsername());
 			password = new JPasswordField(anzDetails.getPassword());
@@ -77,9 +77,9 @@ public class ANZLoginPanel extends JPanel implements ANZLoginListener {
 		loginFailedMessage.setAlignmentX(CENTER_ALIGNMENT);
 
 		int spacing = 16;
-		add(Box.createVerticalStrut(spacing*2));
+		add(Box.createVerticalStrut(spacing * 2));
 		add(image);
-		add(Box.createVerticalStrut(spacing*2));
+		add(Box.createVerticalStrut(spacing * 2));
 		add(username);
 		add(Box.createVerticalStrut(spacing));
 		add(password);
@@ -93,11 +93,7 @@ public class ANZLoginPanel extends JPanel implements ANZLoginListener {
 	}
 
 	boolean login() {
-		if (ANZWebApi.instance.login(username.getText(), password.getText())) {
-			return true;
-		}
-
-		return false;
+		return ANZWebApi.instance.login(username.getText(), password.getText());
 	}
 
 	@Override
@@ -106,7 +102,8 @@ public class ANZLoginPanel extends JPanel implements ANZLoginListener {
 			if (PasswordVault.isPasswordRemembered())
 				PasswordVault.setANZDetails(username.getText(), password.getText());
 			failedAttempts.put(username.getText(), 0);
-		} else {
+		}
+		else {
 			if (!failedAttempts.containsKey(username.getText()))
 				failedAttempts.put(username.getText(), 1);
 			else
@@ -119,10 +116,12 @@ public class ANZLoginPanel extends JPanel implements ANZLoginListener {
 		if (failedAttempts.get(username.getText()) >= maxFailedAttempts) {
 			loginFailedMessage.setText(format(
 					"Invalid username or password. After 3 attempts with the same account name, you will be locked out of your account. in which case call 0800 805 777  (+64 4 499 6655 if overseas)"));
-		} else {
+		}
+		else {
 			loginFailedMessage.setText(format("Invalid username or password"));
 			new Timer().schedule(new TimerTask() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					loginFailedMessage.setText("");
 				}
 			}, loginFailedMessageDuration);
@@ -130,6 +129,6 @@ public class ANZLoginPanel extends JPanel implements ANZLoginListener {
 	}
 
 	private String format(String s) {
-		return "<html><p width=\"256\"><font color=#DE2700>"+s+"</font></p></html>";
+		return "<html><p width=\"256\"><font color=#DE2700>" + s + "</font></p></html>";
 	}
 }

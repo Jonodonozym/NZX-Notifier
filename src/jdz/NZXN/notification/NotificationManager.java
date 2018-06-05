@@ -18,8 +18,9 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -30,8 +31,7 @@ import javax.swing.SwingUtilities;
 
 import jdz.NZXN.config.ConfigChangeListener;
 import jdz.NZXN.config.ConfigProperty;
-import jdz.NZXN.res.Resources;
-import jdz.NZXN.utils.debugging.FileLogger;
+import jdz.NZXN.resources.Resources;
 
 /**
  * Static class that manages notifications by sorting them vertically on the
@@ -53,35 +53,24 @@ import jdz.NZXN.utils.debugging.FileLogger;
  *
  * @author Jaiden Baker
  */
-public class NotificationManager {
-	private static List<Notification> notifications = new ArrayList<Notification>();
+class NotificationManager {
+	private static List<NotificationDialog> notifications = new ArrayList<NotificationDialog>();
 
 	private static Dimension screenSize = null;
 	private static int taskBarHeight, y, x;
 	private static final int yGap = 16;
-	private static final Timer detectScreenChange = new Timer();
 
 	static {
-		detectScreenChange.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if (screenSize == null || !screenSize.equals(Toolkit.getDefaultToolkit().getScreenSize())) {
-					screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-					taskBarHeight = Toolkit.getDefaultToolkit().getScreenSize().height
-							- GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
-					y = screenSize.height - taskBarHeight - yGap;
-					x = screenSize.width - Notification.width - yGap;
-					for (Notification n : notifications) {
-						y -= n.getHeight();
-						n.setLocation(x, y);
-						y -= yGap;
-					}
-				}
-			}
-		}, 0, 1000);
+		if (screenSize == null || !screenSize.equals(Toolkit.getDefaultToolkit().getScreenSize())) {
+			screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			taskBarHeight = Toolkit.getDefaultToolkit().getScreenSize().height
+					- GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
+			y = screenSize.height - taskBarHeight - yGap;
+			x = screenSize.width - NotificationDialog.width - yGap;
+		}
 
 		ConfigChangeListener.register(ConfigProperty.IS_MUTED, (newValue) -> {
-			for (Notification n : notifications)
+			for (NotificationDialog n : notifications)
 				n.setAlwaysOnTop(newValue);
 		});
 	}
@@ -92,22 +81,14 @@ public class NotificationManager {
 	 * 
 	 * @param notifications
 	 */
-	public static void add(List<Notification> notifications) {
-		if (notifications.isEmpty())
-			return;
-		for (Notification n : notifications) {
-			NotificationManager.notifications.add(n);
-			n.setAlwaysOnTop(!ConfigProperty.IS_MUTED.get());
-			y -= n.getHeight();
-			n.setLocation(x, y);
-			y -= yGap;
-		}
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				for (Notification n : notifications)
-					n.setVisible(true);
-			}
+	public static void add(NotificationDialog n) {
+		NotificationManager.notifications.add(n);
+		n.setAlwaysOnTop(!ConfigProperty.IS_MUTED.get());
+		y -= n.getHeight();
+		n.setLocation(x, y);
+		y -= yGap;
+		SwingUtilities.invokeLater(() -> {
+			n.setVisible(true);
 		});
 		if (!ConfigProperty.IS_MUTED.get())
 			playSound();
@@ -120,16 +101,19 @@ public class NotificationManager {
 	 * 
 	 * @param n
 	 */
-	public static void delete(Notification n) {
+	public static void delete(NotificationDialog n) {
 		int index = notifications.indexOf(n);
 		notifications.remove(index);
 		int dy = n.getHeight() + yGap;
 		for (int i = index; i < notifications.size(); i++) {
-			Notification n2 = notifications.get(i);
+			NotificationDialog n2 = notifications.get(i);
 			n2.setLocation(x, n2.getY() + dy);
 		}
 		y += dy;
 	}
+
+	private static boolean soundPlaying = false;
+	private static final ScheduledExecutorService soundSheduler = Executors.newScheduledThreadPool(1);
 
 	/**
 	 * Summons demons from hell and unleashes them on the world, enacting judgment
@@ -137,6 +121,9 @@ public class NotificationManager {
 	 * Seriously, it's called playSound. What did you expect it to do?
 	 */
 	private static void playSound() {
+		if (soundPlaying)
+			return;
+
 		try {
 			InputStream is = NotificationManager.class.getResourceAsStream(Resources.notificationSound);
 			BufferedInputStream bis = new BufferedInputStream(is);
@@ -147,9 +134,15 @@ public class NotificationManager {
 			Clip clip = (Clip) AudioSystem.getLine(info);
 			clip.open(stream);
 			clip.start();
+
+			soundPlaying = true;
+			soundSheduler.schedule(() -> {
+				soundPlaying = false;
+			}, clip.getMicrosecondLength(), TimeUnit.MICROSECONDS);
+
 		}
 		catch (Exception e) {
-			FileLogger.createErrorLog(e);
+			e.printStackTrace();
 		}
 	}
 }

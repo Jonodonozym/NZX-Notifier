@@ -7,11 +7,11 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-public class JImagePanel extends JPanel{
+public class JImagePanel extends JPanel {
 	private static final long serialVersionUID = 1082374290242883422L;
-	
+
 	private final BufferedImage image;
-	
+
 	public JImagePanel(BufferedImage image) {
 		this.image = image;
 		setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
@@ -24,6 +24,6 @@ public class JImagePanel extends JPanel{
 		super.paintComponent(g);
 		g.drawImage(image, 0, 0, null);
 	}
-		
-	
+
+
 }

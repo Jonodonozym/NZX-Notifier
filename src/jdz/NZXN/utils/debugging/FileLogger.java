@@ -51,7 +51,8 @@ public final class FileLogger {
 				file.createNewFile();
 
 			defaultLogWriter = new BufferedWriter(new FileWriter(file));
-		} catch (IOException exception) {
+		}
+		catch (IOException exception) {
 			exception.printStackTrace();
 		}
 	}
@@ -68,7 +69,8 @@ public final class FileLogger {
 				startNewLog();
 			defaultLogWriter.write(getTimestampShort() + ": " + message);
 			defaultLogWriter.newLine();
-		} catch (IOException exception) {
+		}
+		catch (IOException exception) {
 			exception.printStackTrace();
 		}
 	}
@@ -85,6 +87,7 @@ public final class FileLogger {
 		exception.printStackTrace(pw);
 		pw.println();
 		pw.println("Extra data:");
+		exception.printStackTrace();
 		for (String s : extraData)
 			pw.println('\t' + s);
 		String exceptionAsString = pw.toString();
@@ -99,6 +102,7 @@ public final class FileLogger {
 	 * @param exception
 	 */
 	public static void createErrorLog(Exception exception) {
+		exception.printStackTrace();
 		StringWriter sw = new StringWriter();
 		exception.printStackTrace(new PrintWriter(sw));
 		String exceptionAsString = "\n" + sw.toString();
@@ -119,9 +123,7 @@ public final class FileLogger {
 
 		File file = new File(fileDir);
 
-		writeFile(
-				defaultErrorLogMessage,
-				error, file);
+		writeFile(defaultErrorLogMessage, error, file);
 	}
 
 	/**
@@ -135,13 +137,12 @@ public final class FileLogger {
 		createDefaultDirectory(getLogsDirectory());
 		createDefaultDirectory(getLogsDirectory() + File.separator + "Errors");
 
-		File file = new File(getLogsDirectory() + File.separator + "Errors" + File.separator + "Error " + getTimestamp() + ".txt");
+		File file = new File(
+				getLogsDirectory() + File.separator + "Errors" + File.separator + "Error " + getTimestamp() + ".txt");
 
-		writeFile(
-				defaultErrorLogMessage,
-				error, file);
+		writeFile(defaultErrorLogMessage, error, file);
 	}
-	
+
 	static {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -152,7 +153,8 @@ public final class FileLogger {
 			UIManager.put("CheckBox.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
 			UIManager.put("TabbedPane.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
 			UIManager.put("ComboBox.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			createErrorLog(e);
 		}
 	}
@@ -195,7 +197,8 @@ public final class FileLogger {
 			}
 			bfw.write(contents);
 			bfw.close();
-		} catch (IOException exception) {
+		}
+		catch (IOException exception) {
 			exception.printStackTrace();
 		}
 	}

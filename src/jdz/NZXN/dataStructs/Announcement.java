@@ -9,16 +9,18 @@
 
 package jdz.NZXN.dataStructs;
 
+import java.util.Date;
+
 import lombok.Data;
 
 @Data
 public class Announcement {
-	private final String company, companyURL, notification, url, type, time;
+	private final String company, companyURL, notification, url, type;
+	private final Date time;
+	private final String timeString;
 	private final AnnouncementFlag flag;
-	
-	public enum AnnouncementFlag{
-		NONE,
-		PRICE_SENSITIVE,
-		THIRD_PARTY;
+
+	public enum AnnouncementFlag {
+		NONE, PRICE_SENSITIVE, THIRD_PARTY;
 	}
 }

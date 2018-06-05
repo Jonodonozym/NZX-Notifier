@@ -1,11 +1,14 @@
 
 package jdz.NZXN.config;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.JFileChooser;
 
 import jdz.NZXN.utils.StringUtils;
 import lombok.Getter;
@@ -18,25 +21,42 @@ public abstract class ConfigProperty<E> {
 		return Collections.unmodifiableSet(all);
 	}
 
-	public static final ConfigProperty<java.lang.Long> LAST_CHECK = new Long("Last Check", 0L) {
+	public static final ConfigProperty<Long> LAST_CHECK = new LongProperty("Last Check", 0L) {
 		@Override
-		public java.lang.Long getDefaultValue() {
+		public Long getDefaultValue() {
 			return System.currentTimeMillis();
 		}
 	};
 
-	public static final ConfigProperty<java.lang.Integer> CHECK_INTERVAL_MINUTES = new Integer("Check Interval Minutes", 10);
-	public static final ConfigProperty<java.lang.Boolean> ANNOUNCEMENT_ALERTS_ENABLED = new Boolean("Announcement Alerts Enabled", true);
-	public static final ConfigProperty<java.lang.Boolean> ANNOUNCEMENT_SAVING_ENABLED = new Boolean("Announcement Saving Enabled", true);
-	public static final ConfigProperty<List<String>> SECURITY_WHITELIST = new StringList("Security Whitelist", new ArrayList<>());
-	public static final ConfigProperty<List<String>> SECURITY_BLACKLIST = new StringList("Security Blacklist", new ArrayList<>());
-	public static final ConfigProperty<List<String>> TYPE_WHITELIST = new StringList("Type Whitelist", new ArrayList<>());
-	public static final ConfigProperty<List<String>> TYPE_BLACKLIST = new StringList("Type Blacklist", new ArrayList<>());
-	public static final ConfigProperty<List<String>> DESCRIPTION_WHITELIST = new StringList("Description Whitelist", new ArrayList<>());
-	public static final ConfigProperty<List<String>> DESCRIPTION_BLACKLIST = new StringList("Description Blacklist", new ArrayList<>());
-	public static final ConfigProperty<java.lang.Boolean> PRICE_ALERTS_ENABLED = new Boolean("Price Alerts Enabled", true);
-	public static final ConfigProperty<List<String>> PRICE_ALERTS = new StringList("Price Alerts", new ArrayList<>());
-	public static final ConfigProperty<java.lang.Boolean> IS_MUTED = new Boolean("Is Muted", false);
+	public static final ConfigProperty<Integer> CHECK_INTERVAL_MINUTES = new IntegerProperty("Check Interval Minutes",
+			10);
+	public static final ConfigProperty<Boolean> ANNOUNCEMENT_ALERTS_ENABLED = new BooleanProperty(
+			"Announcement Alerts Enabled", true);
+	public static final ConfigProperty<Boolean> ANNOUNCEMENT_SAVING_ENABLED = new BooleanProperty(
+			"Announcement Saving Enabled", false);
+	public static final ConfigProperty<Boolean> GROUP_BY_YEAR = new BooleanProperty(
+			"Group By Year", false);
+	public static final ConfigProperty<Boolean> GROUP_BY_MONTH = new BooleanProperty(
+			"Group By Month", true);
+	public static final ConfigProperty<File> ANNOUNCEMENT_SAVING_FOLDER = new FileProperty("Announcement Saving Folder",
+			new File(new JFileChooser().getFileSystemView().getDefaultDirectory(), "NZX Announcements"));
+	public static final ConfigProperty<List<String>> SECURITY_WHITELIST = new StringListProperty("Security Whitelist",
+			new ArrayList<>());
+	public static final ConfigProperty<List<String>> SECURITY_BLACKLIST = new StringListProperty("Security Blacklist",
+			new ArrayList<>());
+	public static final ConfigProperty<List<String>> TYPE_WHITELIST = new StringListProperty("Type Whitelist",
+			new ArrayList<>());
+	public static final ConfigProperty<List<String>> TYPE_BLACKLIST = new StringListProperty("Type Blacklist",
+			new ArrayList<>());
+	public static final ConfigProperty<List<String>> DESCRIPTION_WHITELIST = new StringListProperty(
+			"Description Whitelist", new ArrayList<>());
+	public static final ConfigProperty<List<String>> DESCRIPTION_BLACKLIST = new StringListProperty(
+			"Description Blacklist", new ArrayList<>());
+	public static final ConfigProperty<Boolean> PRICE_ALERTS_ENABLED = new BooleanProperty("Price Alerts Enabled",
+			true);
+	public static final ConfigProperty<List<String>> PRICE_ALERTS = new StringListProperty("Price Alerts",
+			new ArrayList<>());
+	public static final ConfigProperty<Boolean> IS_MUTED = new BooleanProperty("Is Muted", false);
 
 	@Getter @NonNull private final String name;
 	@Getter @NonNull private final E defaultValue;
@@ -50,66 +70,66 @@ public abstract class ConfigProperty<E> {
 	public String toString(E value) {
 		return value.toString();
 	}
-	
+
 	public E get() {
 		return FileConfiguration.get(this);
 	}
-	
+
 	public void set(E value) {
 		FileConfiguration.set(this, value);
 	}
-	
+
 	public abstract E parse(String s);
-	
-	public static class Integer extends ConfigProperty<java.lang.Integer> {
-		public Integer(String name, java.lang.Integer defaultValue) {
+
+	public static class IntegerProperty extends ConfigProperty<Integer> {
+		public IntegerProperty(String name, Integer defaultValue) {
 			super(name, defaultValue);
 		}
 
 		@Override
-		public java.lang.Integer parse(String s) {
-			return java.lang.Integer.parseInt(s);
+		public Integer parse(String s) {
+			return Integer.parseInt(s);
 		}
 	}
-	
-	public static class Double extends ConfigProperty<java.lang.Double> {
-		public Double(String name, java.lang.Double defaultValue) {
+
+	public static class DoubleProperty extends ConfigProperty<Double> {
+		public DoubleProperty(String name, Double defaultValue) {
 			super(name, defaultValue);
 		}
 
 		@Override
-		public java.lang.Double parse(String s) {
-			return java.lang.Double.parseDouble(s);
+		public Double parse(String s) {
+			return Double.parseDouble(s);
 		}
 	}
-	
-	public static class Long extends ConfigProperty<java.lang.Long> {
-		public Long(String name, java.lang.Long defaultValue) {
+
+	public static class LongProperty extends ConfigProperty<Long> {
+		public LongProperty(String name, Long defaultValue) {
 			super(name, defaultValue);
 		}
 
 		@Override
-		public java.lang.Long parse(String s) {
-			return java.lang.Long.parseLong(s);
+		public Long parse(String s) {
+			return Long.parseLong(s);
 		}
 	}
-	
-	public static class Boolean extends ConfigProperty<java.lang.Boolean> {
-		public Boolean(String name, java.lang.Boolean defaultValue) {
+
+	public static class BooleanProperty extends ConfigProperty<Boolean> {
+		public BooleanProperty(String name, Boolean defaultValue) {
 			super(name, defaultValue);
 		}
 
 		@Override
-		public java.lang.Boolean parse(String s) {
-			return java.lang.Boolean.parseBoolean(s);
+		public Boolean parse(String s) {
+			return Boolean.parseBoolean(s);
 		}
 	}
-	
-	public static class StringList extends ConfigProperty<List<String>>{
-		public StringList(String name, List<String> defaultValue) {
+
+	public static class StringListProperty extends ConfigProperty<List<String>> {
+		public StringListProperty(String name, List<String> defaultValue) {
 			super(name, defaultValue);
 		}
-		
+
 		@Override
 		public String toString(List<String> list) {
 			return StringUtils.mergeList(list, ",");
@@ -118,6 +138,22 @@ public abstract class ConfigProperty<E> {
 		@Override
 		public List<String> parse(String s) {
 			return StringUtils.parseList(s, ",");
-		}	
+		}
+	}
+
+	public static class FileProperty extends ConfigProperty<File> {
+		public FileProperty(String name, File defaultValue) {
+			super(name, defaultValue);
+		}
+
+		@Override
+		public File parse(String s) {
+			return new File(s);
+		}
+
+		@Override
+		public String toString(File file) {
+			return file.getAbsolutePath();
+		}
 	}
 }

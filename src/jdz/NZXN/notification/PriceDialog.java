@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import jdz.NZXN.checker.PriceChangeEvent;
 import jdz.NZXN.utils.swing.JHyperlink;
 import jdz.NZXN.webApi.Websites;
 
@@ -27,47 +28,47 @@ import jdz.NZXN.webApi.Websites;
  * @author Jaiden Baker
  */
 @SuppressWarnings("serial")
-public class PriceNotification extends Notification{
-	private static Font priceFont = new Font("Calibri", Font.PLAIN, 40);
-	private static Font secFont = new Font("Calibri", Font.PLAIN, 20);
-	private static int width = 480;
-	private String security;
-	private double price, oldPrice;
+class PriceDialog extends NotificationDialog {
+	private static final Font priceFont = new Font("Calibri", Font.PLAIN, 40);
+	private static final Font secFont = new Font("Calibri", Font.PLAIN, 20);
 	
-	public PriceNotification(String security, double price, double oldPrice) {
+	private final String security;
+	private final double price, oldPrice;
+
+	public PriceDialog(PriceChangeEvent event) {
 		super();
-		
-		this.security = security;
-		this.price = price;
-		this.oldPrice = oldPrice;
-		setMinimumSize(new Dimension(width,144));
-		
-	    displayContents();
+
+		this.security = event.getSecurity();
+		this.price = event.getPrice();
+		this.oldPrice = event.getOldPrice();
+		setMinimumSize(new Dimension(width, 144));
+
+		displayContents();
 	}
-	
+
 	@Override
 	protected JPanel getNotificationPanel() {
 		final JPanel contentPanel = new JPanel();
-		contentPanel.setName(security+" Price Alert");
+		contentPanel.setName(security + " Price Alert");
 		contentPanel.setLayout(new BorderLayout());
 		contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 8, 8, 8));
-		
-		String arrow = oldPrice < price ?
-				"<font color=#49A942>&#x25B2;</font>":
-				"<font color=#C12828>&#x25BC;</font>";
+
+		String arrow = oldPrice < price ? "<font color=#49A942>&#x25B2;</font>" : "<font color=#C12828>&#x25BC;</font>";
 		arrow = oldPrice == price ? "" : arrow;
-		
-		JLabel priceLabel = new JHyperlink("<html>"+arrow+"&nbsp;&nbsp;"+price+"¢&nbsp;&nbsp;"+arrow+"</html>" , Websites.NZXsecurityURL+security);
-		JLabel secLabel = new JHyperlink(security,Websites.NZXsecurityURL+security);
-		
+
+		JLabel priceLabel = new JHyperlink(
+				"<html>" + arrow + "&nbsp;&nbsp;" + price + "¢&nbsp;&nbsp;" + arrow + "</html>",
+				Websites.NZXsecurityURL + security);
+		JLabel secLabel = new JHyperlink(security, Websites.NZXsecurityURL + security);
+
 		priceLabel.setFont(priceFont);
 		secLabel.setFont(secFont);
 
 		priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		secLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		
-		contentPanel.add(priceLabel,BorderLayout.CENTER);
-		contentPanel.add(secLabel,BorderLayout.PAGE_END);
+
+		contentPanel.add(priceLabel, BorderLayout.CENTER);
+		contentPanel.add(secLabel, BorderLayout.PAGE_END);
 		return contentPanel;
 	}
 }
