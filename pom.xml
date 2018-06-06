@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>jdz.dev</groupId>
 	<artifactId>NZXNotifier</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
@@ -26,10 +26,26 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.1.1</version>
+				<configuration>
+					<minimizeJar>true</minimizeJar>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.1</version>
 				<configuration>
-					<outputDirectory>D:\Personal utilities</outputDirectory>
+					<outputDirectory>D:\Personal utilities\NZXN</outputDirectory>
 				</configuration>
 			</plugin>
 		</plugins>
