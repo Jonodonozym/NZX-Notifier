@@ -1,5 +1,5 @@
 
-package jdz.NZXN.io;
+package jdz.NZXN.logger;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,7 +13,7 @@ import jdz.NZXN.checker.AnnouncementEvent;
 import jdz.NZXN.config.ConfigProperty;
 import jdz.NZXN.dataStructs.Announcement;
 
-public class AnnouncementIO {
+public class AnnouncementFileLogger {
 	@Subscribe public void onAnnouncement(AnnouncementEvent event) {
 		addToCSV(event.getAnnouncements());
 	}
@@ -27,7 +27,7 @@ public class AnnouncementIO {
 			for (Announcement a : announcements) {
 				bw.write(a.getCompany() + "," + "\"=HYPERLINK(\"\"" + a.getUrl() + "\"\",\"\""
 						+ a.getNotification().replace(")", "").replace("(", "") + "\"\")\"" + "," + a.getType() + ","
-						+ a.getTime() + "," + a.getFlag());
+						+ a.getTimeString() + "," + a.getFlag());
 				bw.newLine();
 			}
 			bw.flush();

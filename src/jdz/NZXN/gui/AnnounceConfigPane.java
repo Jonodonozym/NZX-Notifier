@@ -32,7 +32,7 @@ import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
 import jdz.NZXN.config.ConfigProperty;
-import jdz.NZXN.io.AnnouncementIO;
+import jdz.NZXN.logger.AnnouncementFileLogger;
 import jdz.NZXN.resources.Resources;
 import jdz.NZXN.utils.StringUtils;
 
@@ -154,7 +154,7 @@ public class AnnounceConfigPane extends JPanel {
 		JButton seePastAnnouncements = new JButton("View Past Announcements");
 		seePastAnnouncements.addActionListener((e) -> {
 			try {
-				Desktop.getDesktop().open(AnnouncementIO.getCSVFile());
+				Desktop.getDesktop().open(AnnouncementFileLogger.getCSVFile());
 			}
 			catch (IOException e1) {
 				e1.printStackTrace();

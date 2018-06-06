@@ -58,7 +58,7 @@ public class ConfigWindow extends JSysTrayFrame {
 	 */
 	public ConfigWindow(boolean isVisible) {
 		super("NZX Notifier",
-				"The NZX Notifier is still running. " + "Double click this icon to re-open the config window.",
+				"The NZX Notifier is still running. " + "Double click the tray icon to re-open the config window.",
 				new JPanel(), Resources.appIcon);
 
 		MenuItem configureItem = new MenuItem("Configure");
@@ -88,7 +88,6 @@ public class ConfigWindow extends JSysTrayFrame {
 		});
 		addSysTrayMenuItem(muteItem);
 
-		// adding each panel to a tabbed frame
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.add("Main Config", mainConfig);
 		tabbedPane.add("Announcement Filters", announceConfig);
@@ -97,32 +96,20 @@ public class ConfigWindow extends JSysTrayFrame {
 
 		setContentPane(tabbedPane);
 
-		// auto-save the config before running a check
-		AnnouncementChecker.getInstance().addTaskBeforeCheck(new Runnable() {
-			@Override
-			public void run() {
-				saveConfig();
-			}
+		AnnouncementChecker.getInstance().addTaskBeforeCheck(() -> {
+			saveConfig();
 		});
 
-		// auto-save when the program is closed
-		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-			@Override
-			public void run() {
-				saveConfig();
-			}
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			saveConfig();
 		}));
 
-		// center the window and display if isVisible is true
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				pack();
-				Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-				setLocation(dim.width / 2 - getWidth() / 2, dim.height / 2 - getHeight() / 2);
-				setVisible(isVisible);
-				toFront();
-			}
+		SwingUtilities.invokeLater(() -> {
+			pack();
+			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+			setLocation(dim.width / 2 - getWidth() / 2, dim.height / 2 - getHeight() / 2);
+			setVisible(isVisible);
+			toFront();
 		});
 	}
 
