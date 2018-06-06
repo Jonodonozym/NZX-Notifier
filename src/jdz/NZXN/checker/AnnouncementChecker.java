@@ -9,20 +9,20 @@
 
 package jdz.NZXN.checker;
 
-import jdz.NZXN.config.FileConfiguration;
-import jdz.NZXN.NZXN;
-import jdz.NZXN.config.ConfigChangeListener;
-import jdz.NZXN.config.ConfigProperty;
-import jdz.NZXN.dataStructs.Announcement;
-import jdz.NZXN.gui.ConfigWindow;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import jdz.NZXN.NZXN;
+import jdz.NZXN.config.ConfigChangeListener;
+import jdz.NZXN.config.ConfigProperty;
+import jdz.NZXN.config.FileConfiguration;
+import jdz.NZXN.dataStructs.Announcement;
+import jdz.NZXN.gui.ConfigWindow;
 import jdz.NZXN.utils.ComparePrice;
 import jdz.NZXN.utils.SleepModeDetector;
 import jdz.NZXN.utils.SleepModeListener;
@@ -32,9 +32,10 @@ import lombok.Getter;
 
 public class AnnouncementChecker implements SleepModeListener {
 	@Getter private static final AnnouncementChecker instance = new AnnouncementChecker();
+	
+	public static void init() { }
 
-	private TimerTask runningTask = null;
-	private Thread checkThread = null;
+	private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 	private List<Runnable> runBeforeCheck = new ArrayList<Runnable>();
 	private List<Runnable> runAfterCheck = new ArrayList<Runnable>();
 	private List<Runnable> runEachSecond = new ArrayList<Runnable>();
@@ -48,26 +49,16 @@ public class AnnouncementChecker implements SleepModeListener {
 		});
 
 		SleepModeDetector.addListener(this);
-	}
-
-	public void start() {
-		if (runningTask != null)
-			throw new RuntimeException("Error: only 1 CheckAnnouncementsTask can exist at a time");
-
-		runningTask = new TimerTask() {
-			@Override
-			public void run() {
-				if (++secondsSinceCheck >= intervalSeconds)
-					check();
-				for (Runnable r : runEachSecond)
-					r.run();
-			}
-		};
-
+		
 		intervalSeconds = ConfigProperty.CHECK_INTERVAL_MINUTES.get() * 60;
 		lastCheck = ConfigProperty.LAST_CHECK.get();
 
-		new Timer().schedule(runningTask, 1000, 1000);
+		scheduler.scheduleAtFixedRate(() -> {
+			if (++secondsSinceCheck >= intervalSeconds)
+				check();
+			for (Runnable r : runEachSecond)
+				r.run();
+		}, 1, 1, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -75,16 +66,9 @@ public class AnnouncementChecker implements SleepModeListener {
 	 * at a time
 	 */
 	public void check() {
-		if (checkThread == null) {
-			checkThread = new Thread() {
-				@Override
-				public void run() {
-					doCheck();
-					checkThread = null;
-				}
-			};
-			checkThread.run();
-		}
+		scheduler.execute(() -> {
+			doCheck();
+		});
 	}
 
 	private void doCheck() {
@@ -173,7 +157,6 @@ public class AnnouncementChecker implements SleepModeListener {
 
 	@Override
 	public void onDeviceWake() {
-		// TODO Auto-generated method stub
-
+		secondsSinceCheck = (int)(System.currentTimeMillis() - lastCheck)/1000;
 	}
 }

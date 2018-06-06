@@ -27,7 +27,7 @@ import com.google.common.eventbus.EventBus;
 import jdz.NZXN.checker.AnnouncementChecker;
 import jdz.NZXN.gui.ConfigWindow;
 import jdz.NZXN.gui.UIManager;
-import jdz.NZXN.io.AnnouncementIO;
+import jdz.NZXN.logger.AnnouncementFileLogger;
 import jdz.NZXN.notification.NotificationListener;
 import jdz.NZXN.utils.swing.JSplashFrame;
 import lombok.Getter;
@@ -38,7 +38,7 @@ public class NZXN {
 	static {
 		UIManager.useCleanStyle();
 
-		eventBus.register(new AnnouncementIO());
+		eventBus.register(new AnnouncementFileLogger());
 		eventBus.register(new NotificationListener());
 	}
 
@@ -55,9 +55,10 @@ public class NZXN {
 		if (!argsList.contains("S"))
 			splashFrame = new JSplashFrame();
 
-		AnnouncementChecker.getInstance().start();
 		ConfigWindow window = new ConfigWindow(false);
+
 		AnnouncementChecker.getInstance().check();
+
 		if (argsList.contains("S"))
 			window.sendToTray(new WindowEvent(window, WindowEvent.WINDOW_ICONIFIED, 0, Frame.ICONIFIED), false);
 		else {
