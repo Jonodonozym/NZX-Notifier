@@ -17,6 +17,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -35,6 +37,7 @@ import jdz.NZXN.utils.swing.JHyperlink;
 @SuppressWarnings("serial")
 public class AnnouncementDialog extends NotificationDialog {
 	public static final Font mainFont = new Font("Calibri", Font.PLAIN, 12);
+	private static final DateFormat dateFormatter = new SimpleDateFormat("h:mm a");
 	private static int maxAnnouncements = 10;
 	private List<Announcement> announcements;
 
@@ -79,7 +82,7 @@ public class AnnouncementDialog extends NotificationDialog {
 
 			columns[0].add(new JHyperlink(a.getCompany(), a.getCompanyURL()));
 			columns[1].add(new JHyperlink(l2Text, a.getUrl()));
-			columns[2].add(new JLabel(a.getTimeString()));
+			columns[2].add(new JLabel(dateFormatter.format(a.getTime())));
 		}
 
 		// adding columns to the container, then to the content panel
